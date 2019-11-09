@@ -1,5 +1,6 @@
 package com.example.recycling.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -7,8 +8,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -18,7 +20,9 @@ public class WantedItem {
     @Id
     private String id;
     private String description;
-    private Timestamp listUntilDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+    private LocalDateTime listUntilDate;
     private List<String> categories;
 
     @DBRef
@@ -29,7 +33,9 @@ public class WantedItem {
     @NoArgsConstructor
     public static class WantedItemDTO {
         private String description;
-        private Timestamp listUntilDate;
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+        private LocalDateTime listUntilDate;
         private List<String> categories;
     }
 }

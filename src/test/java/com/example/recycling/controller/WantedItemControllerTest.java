@@ -1,6 +1,8 @@
 package com.example.recycling.controller;
 
+import com.example.recycling.entity.User;
 import com.example.recycling.entity.WantedItem;
+import com.example.recycling.repository.UserRepository;
 import com.example.recycling.repository.WantedItemRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.util.NestedServletException;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,12 +39,26 @@ class WantedItemControllerTest {
     @Autowired
     private WantedItemController controller;
 
+    @Autowired
+    private UserRepository userRepository;
+
     private WantedItem item;
     private MockMvc mockMvc;
 
+
     @BeforeEach
     void setUp() {
-        item = new WantedItem().setCategories(Arrays.asList("foo", "bar")).setDescription("Itemy");
+        User user = new User()
+                .setUsername("Arthur Dent")
+                .setAddress("Earth")
+                .setPostcode("postcode")
+                .setPassword("Wow, it's a password!");
+        userRepository.save(user);
+        item = new WantedItem()
+                .setCategories(Arrays.asList("foo", "bar"))
+                .setDescription("Itemy")
+                .setListUntilDate(LocalDateTime.of(2019, 11, 9, 21, 55, 0))
+                .setUser(user);
         repo.save(item);
 
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
@@ -50,6 +67,7 @@ class WantedItemControllerTest {
     @AfterEach
     void tearDown() {
         repo.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -81,7 +99,7 @@ class WantedItemControllerTest {
         assertThatThrownBy(() -> mockMvc.perform(post("/api/wanted")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8")
-                .content("description=an+item&listUntilDate=2019-11-05+21%3A35%3A48&categories=items%2Calso%2Bitems"))
+                .content("description=an+item&listUntilDate=2019-11-05T21%3A35%3A48Z&categories=items%2Calso%2Bitems"))
                 .andExpect(status().isUnauthorized())).isInstanceOf(NestedServletException.class).hasMessageContaining("Access is denied");
     }
 
@@ -91,7 +109,7 @@ class WantedItemControllerTest {
         String uri = mockMvc.perform(post("/api/wanted")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8")
-                .content("description=an+item&listUntilDate=2019-11-05+21%3A35%3A48&categories=items%2Calso%2Bitems"))
+                .content("description=an+item&listUntilDate=2019-11-05T21%3A35%3A48Z&categories=items%2Calso%2Bitems"))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getHeader("Location");
 

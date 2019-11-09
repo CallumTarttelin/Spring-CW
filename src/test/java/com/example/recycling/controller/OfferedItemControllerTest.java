@@ -1,7 +1,9 @@
 package com.example.recycling.controller;
 
 import com.example.recycling.entity.OfferedItem;
+import com.example.recycling.entity.User;
 import com.example.recycling.repository.OfferedItemRepository;
+import com.example.recycling.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.util.NestedServletException;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,6 +38,9 @@ class OfferedItemControllerTest {
     private OfferedItemRepository repo;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private OfferedItemController controller;
 
     private OfferedItem item;
@@ -42,7 +48,18 @@ class OfferedItemControllerTest {
 
     @BeforeEach
     void setUp() {
-        item = new OfferedItem().setCondition("new").setCategories(Arrays.asList("foo", "bar")).setDescription("Itemy");
+        User user = new User()
+                .setUsername("Arthur Dent")
+                .setAddress("Earth")
+                .setPostcode("postcode")
+                .setPassword("Wow, it's a password!");
+        userRepository.save(user);
+        item = new OfferedItem()
+                .setCondition("new")
+                .setCategories(Arrays.asList("foo", "bar"))
+                .setDescription("Itemy")
+                .setListUntilDate(LocalDateTime.of(2019, 11, 9, 21, 55, 0))
+                .setUser(user);
         repo.save(item);
 
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
@@ -51,6 +68,7 @@ class OfferedItemControllerTest {
     @AfterEach
     void tearDown() {
         repo.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -58,7 +76,8 @@ class OfferedItemControllerTest {
     void unregisteredUser_canViewAnItemsDescription() throws Exception {
         mockMvc.perform(get("/api/offered/" + item.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("description", equalTo("Itemy")));
+                .andExpect(jsonPath("description", equalTo("Itemy")))
+                .andExpect(jsonPath("listUntilDate", equalTo("2019-11-09T21:55:00Z")));
     }
 
     @Test
@@ -82,7 +101,7 @@ class OfferedItemControllerTest {
         assertThatThrownBy(() -> mockMvc.perform(post("/api/offered")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8")
-                .content("condition=new&description=an+item&listUntilDate=2019-11-05+21%3A35%3A48&categories=items%2Calso%2Bitems"))
+                .content("condition=new&description=an+item&listUntilDate=2019-11-05T21%3A35%3A48Z&categories=items%2Calso%2Bitems"))
                 .andExpect(status().isUnauthorized())).isInstanceOf(NestedServletException.class).hasMessageContaining("Access is denied");
     }
 
@@ -92,7 +111,7 @@ class OfferedItemControllerTest {
         String uri = mockMvc.perform(post("/api/offered")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8")
-                .content("condition=new&description=an+item&listUntilDate=2019-11-05+21%3A35%3A48&categories=items%2Calso%2Bitems"))
+                .content("condition=new&description=an+item&listUntilDate=2019-11-05T21%3A35%3A48Z&categories=items%2Calso%2Bitems"))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getHeader("Location");
 
