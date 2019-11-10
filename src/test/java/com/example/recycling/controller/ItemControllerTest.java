@@ -6,7 +6,6 @@ import com.example.recycling.entity.Response;
 import com.example.recycling.entity.User;
 import com.example.recycling.repository.ItemRepository;
 import com.example.recycling.repository.UserRepository;
-import com.example.recycling.service.ConstantsService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,8 +62,8 @@ class ItemControllerTest {
                         .setAddress("Earth")
                         .setPostcode("postcode")
                         .setPassword("Wow, it's a password!")
-                        .setAuthorities(List.of(ConstantsService.AUTHENTICATED_USER))
                 ));
+        user.getEmailSettings().setVerified(true);
         item = Item.offeredItem()
                 .setCondition("new")
                 .setCategories(Arrays.asList("foo", "bar"))

@@ -17,11 +17,19 @@ public class UserProvider {
         }
     }
 
+    private static Optional<User> getOptionalUser() {
+        return getRecyclingUser().map(RecyclingUser::getUser);
+    }
+
     public static User getUser() {
-        return getRecyclingUser().map(RecyclingUser::getUser).orElse(null);
+        return getOptionalUser().orElse(null);
     }
 
     public static String getUsername() {
         return getRecyclingUser().map(RecyclingUser::getUsername).orElse(null);
+    }
+
+    public static String getEmail() {
+        return getOptionalUser().map(User::getEmail).orElse(null);
     }
 }

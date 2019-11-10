@@ -56,15 +56,17 @@ class UserControllerTest {
                 .setAddress("Earth")
                 .setPostcode("postcode")
                 .setPassword("Wow, it's a password!");
+        arthur.getEmailSettings().setVerified(true);
         repo.save(arthur);
 
         zaphod = new User()
                 .setUsername("Zaphod Beeblebrox")
                 .setAddress("Heart of Gold")
-                .setEmail("zaphod@beeblebrox.com")
+                .setEmail("zaphod.beeblebrox@callumtarttelin.com")
                 .setPostcode("SPACE")
                 .setPassword("foo")
                 .setAuthorities(List.of(ConstantsService.AUTHENTICATED_USER, "Ex-Galactic_President"));
+        zaphod.getEmailSettings().setVerified(true);
         repo.save(zaphod);
     }
 
@@ -95,7 +97,7 @@ class UserControllerTest {
     @Test
     void whenSendingValidUserData_aUserIsCreated() throws Exception {
         String uri = mockMvc.perform(post("/api/user")
-                .content("username=Ford&address=My+House&postcode=My+Postcode&email=my%40email.com&password=password")
+                .content("username=Ford&address=My+House&postcode=My+Postcode&email=arthur.dent%40callumtarttelin.com&password=password")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getHeader("Location");
@@ -107,9 +109,9 @@ class UserControllerTest {
     }
 
     @Test
-    void duplicateUsernames_returnsBadRequest() throws Exception {
+    void duplicateUsername_returnsBadRequest() throws Exception {
         mockMvc.perform(post("/api/user")
-                .content("username=Arthur+Dent&address=My+House&postcode=My+Postcode&email=my%40email.com&password=password")
+                .content("username=Arthur+Dent&address=My+House&postcode=My+Postcode&email=arthur.dent%40callumtarttelin.com&password=password")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
                 .andExpect(status().isBadRequest());
     }
@@ -144,7 +146,7 @@ class UserControllerTest {
     void registeredUser_canPatchProfile() throws Exception {
         String originalPass = zaphod.getPassword();
         mockMvc.perform(patch("/api/user")
-                .content("password=Zaphod123&postcode=new+postcode&email=zaphod.beeblebrox%40hhgttg.com&address=new+address")
+                .content("password=Zaphod123&postcode=new+postcode&email=zaphod.beeblebrox%40callumtarttelin.com&address=new+address")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8"))
                 .andExpect(status().isNoContent());
@@ -154,6 +156,7 @@ class UserControllerTest {
         User updated = optionalUpdated.get();
         assertThat(updated.getPassword()).isNotEqualTo("Zaphod123");
         assertThat(updated.getPassword()).isNotEqualTo(originalPass);
-        assertThat(updated.getEmail()).isEqualTo("zaphod.beeblebrox@hhgttg.com");
+        assertThat(updated.getEmail()).isEqualTo("zaphod.beeblebrox@callumtarttelin.com");
+        assertThat(updated.getEmailSettings().getVerified()).isFalse();
     }
 }
