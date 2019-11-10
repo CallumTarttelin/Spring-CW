@@ -53,7 +53,7 @@ public class ItemController {
             return ResponseEntity.notFound().build();
         }
         Item item = optionalItem.get();
-        if (! item.getUser().equals(UserProvider.getUser())) {
+        if (! item.getUser().getUsername().equals(UserProvider.getUsername())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         repo.deleteById(id);
@@ -68,7 +68,7 @@ public class ItemController {
             return ResponseEntity.notFound().build();
         }
         Item item = optionalItem.get();
-        if (! item.getUser().equals(UserProvider.getUser())) {
+        if (! item.getUser().getUsername().equals(UserProvider.getUsername())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         item.setCondition(updated.getCondition() != null ? updated.getCondition() : item.getCondition());
