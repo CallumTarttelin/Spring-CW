@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 
 @Data
@@ -26,6 +27,10 @@ public class OfferedItem {
     private LocalDateTime listUntilDate;
     private List<String> categories;
     private List<Question> questions;
+
+    public OfferedItem() {
+        this.questions = new LinkedList<>();
+    }
 
     @DBRef
     @Field("user")

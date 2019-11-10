@@ -1,6 +1,7 @@
 package com.example.recycling.controller;
 
 import com.example.recycling.entity.Question;
+import com.example.recycling.entity.Response;
 import com.example.recycling.entity.WantedItem;
 import com.example.recycling.repository.WantedItemRepository;
 import com.example.recycling.service.RolesService;
@@ -65,13 +66,36 @@ public class WantedItemController {
         WantedItem item = wantedItem.get();
         Question question = new Question()
                 .setMessage(questionDTO.getMessage())
-                .setResponse(new LinkedList<>())
+                .setResponses(new LinkedList<>())
                 .setSentBy(UserProvider.getUser());
         item.getQuestions().add(question);
         repo.save(item);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().replacePath("/api/wanted/{id}")
                 .buildAndExpand(id).toUri();
+        return ResponseEntity.created(location).build();
+    }
+
+    @Secured(RolesService.AUTHENTICATED_USER)
+    @PostMapping(value = "/wanted/{itemId}/question/{questionId}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<Void> answerQuestion(@PathVariable String itemId, @PathVariable String questionId, Question.QuestionDTO questionDTO) {
+        Optional<WantedItem> optionalItem = repo.findById(itemId);
+        Optional<Question> optionalQuestion = optionalItem.flatMap( item ->
+                item.getQuestions().stream().filter(question -> question.getId().equals(questionId)).findFirst()
+        );
+        if (optionalQuestion.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        WantedItem item = optionalItem.get();
+        Question question = optionalQuestion.get();
+        Response response = new Response()
+                .setMessage(questionDTO.getMessage())
+                .setSentBy(UserProvider.getUser());
+        question.getResponses().add(response);
+        repo.save(item);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest().replacePath("/api/wanted/{id}")
+                .buildAndExpand(itemId).toUri();
         return ResponseEntity.created(location).build();
     }
 
