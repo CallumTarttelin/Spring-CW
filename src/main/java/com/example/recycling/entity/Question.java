@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,6 +20,7 @@ public class Question {
 
     public Question() {
         this.setId(UUID.randomUUID().toString());
+        this.setResponses(new LinkedList<>());
     }
 
     @Getter

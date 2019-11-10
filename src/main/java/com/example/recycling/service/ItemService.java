@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.LinkedList;
 import java.util.Optional;
 
 @Service
@@ -44,7 +43,6 @@ public class ItemService {
         Item item = optionalItem.get();
         Question question = new Question()
                 .setMessage(questionDTO.getMessage())
-                .setResponses(new LinkedList<>())
                 .setSentBy(UserProvider.getUser());
         item.getQuestions().add(question);
         repo.save(item);

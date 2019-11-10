@@ -22,7 +22,6 @@ import org.springframework.web.util.NestedServletException;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -66,8 +65,7 @@ class WantedItemControllerTest {
                 .setListUntilDate(LocalDateTime.of(2019, 11, 9, 21, 55, 0))
                 .setUser(user);
         question = new Question()
-                .setMessage("Hello")
-                .setResponses(new LinkedList<>());
+                .setMessage("Hello");
         item.getQuestions().add(question);
         repo.save(item);
 
