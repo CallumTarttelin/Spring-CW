@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,7 +27,7 @@ public class ItemService {
                 .setCondition(itemDTO.getCondition())
                 .setDescription(itemDTO.getDescription())
                 .setListUntilDate(itemDTO.getListUntilDate())
-                .setCategories(itemDTO.getCategories())
+                .setCategories(List.of(itemDTO.getCategories().split(",")))
                 .setUser(UserProvider.getUser());
         Item saved = repo.save(item);
         URI location = ServletUriComponentsBuilder
