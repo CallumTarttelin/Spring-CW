@@ -1,7 +1,6 @@
 package com.example.recycling.entity;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,10 +10,9 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Getter
-@Setter
 @Accessors(chain = true)
 public class RecyclingUser implements UserDetails {
-    private User user;
+    private final User user;
 
     public RecyclingUser(User user) {
         this.user = user;

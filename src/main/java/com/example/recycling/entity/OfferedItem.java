@@ -31,7 +31,7 @@ public class OfferedItem {
     private List<Question> questions;
 
     public OfferedItem() {
-        this.questions = new LinkedList<>();
+        setQuestions(new LinkedList<>());
     }
 
     @DBRef

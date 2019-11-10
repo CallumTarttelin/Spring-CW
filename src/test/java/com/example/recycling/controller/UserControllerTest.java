@@ -94,12 +94,8 @@ class UserControllerTest {
 
     @Test
     void whenSendingValidUserData_aUserIsCreated() throws Exception {
-        User newUser = new User().setUsername("Ford Prefect").setPassword("password");
-        controller.makeUser(newUser);
-        assertThat(repo.existsById(newUser.getUsername())).isTrue();
-
         String uri = mockMvc.perform(post("/api/user")
-                .content("username=Saskcow&address=My+House&postcode=My+Postcode&email=my%40email.com&password=password")
+                .content("username=Ford&address=My+House&postcode=My+Postcode&email=my%40email.com&password=password")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getHeader("Location");
@@ -108,6 +104,14 @@ class UserControllerTest {
         String id = uri.split("/")[uri.split("/").length - 1];
 
         assertThat(repo.existsById(id)).isTrue();
+    }
+
+    @Test
+    void duplicateUsernames_returnsBadRequest() throws Exception {
+        mockMvc.perform(post("/api/user")
+                .content("username=Arthur+Dent&address=My+House&postcode=My+Postcode&email=my%40email.com&password=password")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -120,20 +124,36 @@ class UserControllerTest {
 
     @Test
     @WithUserDetails("Zaphod Beeblebrox")
-    // TODO see if I can make sure this always has user
-    void registeredUser_canPatchProfile() throws Exception {
+    void registeredUser_keepsExisting() throws Exception {
         String originalPass = zaphod.getPassword();
         mockMvc.perform(patch("/api/user")
-                .content("{\"password\": \"bar\", \"address\": \"foo\"}")
-                .contentType(MediaType.APPLICATION_JSON)
+                .content("")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8"))
                 .andExpect(status().isNoContent());
 
         Optional<User> optionalUpdated = repo.findByUsernameIgnoreCase(zaphod.getUsername());
         assertThat(optionalUpdated).isPresent();
         User updated = optionalUpdated.get();
-        assertThat(updated.getPassword()).isNotEqualTo("bar");
+        assertThat(updated.getPassword()).isEqualTo(originalPass);
+        assertThat(updated.getAddress()).isEqualTo(zaphod.getAddress());
+    }
+
+    @Test
+    @WithUserDetails("Zaphod Beeblebrox")
+    void registeredUser_canPatchProfile() throws Exception {
+        String originalPass = zaphod.getPassword();
+        mockMvc.perform(patch("/api/user")
+                .content("password=Zaphod123&postcode=new+postcode&email=zaphod.beeblebrox%40hhgttg.com&address=new+address")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .characterEncoding("UTF-8"))
+                .andExpect(status().isNoContent());
+
+        Optional<User> optionalUpdated = repo.findByUsernameIgnoreCase(zaphod.getUsername());
+        assertThat(optionalUpdated).isPresent();
+        User updated = optionalUpdated.get();
+        assertThat(updated.getPassword()).isNotEqualTo("Zaphod123");
         assertThat(updated.getPassword()).isNotEqualTo(originalPass);
-        assertThat(updated.getAddress()).isEqualTo("foo");
+        assertThat(updated.getEmail()).isEqualTo("zaphod.beeblebrox@hhgttg.com");
     }
 }

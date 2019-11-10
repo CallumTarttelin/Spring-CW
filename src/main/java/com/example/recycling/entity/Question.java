@@ -18,7 +18,7 @@ public class Question {
     private List<Response> responses;
 
     public Question() {
-        this.id = UUID.randomUUID().toString();
+        this.setId(UUID.randomUUID().toString());
     }
 
     @Getter

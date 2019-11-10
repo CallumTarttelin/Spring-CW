@@ -30,7 +30,7 @@ public class WantedItem {
     private List<Question> questions;
 
     public WantedItem() {
-        this.questions = new LinkedList<>();
+        setQuestions(new LinkedList<>());
     }
 
     @DBRef

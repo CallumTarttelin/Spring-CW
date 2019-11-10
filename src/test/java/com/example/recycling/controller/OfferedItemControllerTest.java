@@ -23,6 +23,7 @@ import org.springframework.web.util.NestedServletException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -68,7 +69,7 @@ class OfferedItemControllerTest {
                 .setUser(user);
         question = new Question()
                 .setMessage("Hello")
-                .setResponses(new LinkedList<>());
+                .setResponses(new LinkedList<>(List.of(new Response().setMessage("Hi"))));
         item.getQuestions().add(question);
         repo.save(item);
 
@@ -220,7 +221,7 @@ class OfferedItemControllerTest {
                 .andReturn().getResponse().getHeader("Location");
         assertThat(location).endsWith(basePath);
         OfferedItem commented = repo.findById(item.getId()).orElseThrow();
-        assertThat(commented.getQuestions().get(0).getResponses()).hasSize(1);
+        assertThat(commented.getQuestions().get(0).getResponses()).hasSize(2);
         assertThat(commented.getQuestions().stream()
                 .flatMap(question -> question.getResponses().stream())
                 .map(Response::getMessage)

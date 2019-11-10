@@ -58,8 +58,8 @@ public class UserController {
     }
 
     @Secured(RolesService.AUTHENTICATED_USER)
-    @PatchMapping("/user")
-    public ResponseEntity<Void> updateUser(@RequestBody User updated) {
+    @PatchMapping(value = "/user", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<Void> updateUser(User updated) {
         User user = UserProvider.getUser();
         user.setPassword(updated.getPassword() != null ? recyclingUserService.passwordEncoder().encode(updated.getPassword()) : user.getPassword());
         user.setPostcode(updated.getPostcode() != null ? updated.getPostcode() : user.getPostcode());
