@@ -47,7 +47,7 @@ public class ItemService {
         item.getQuestions().add(question);
         repo.save(item);
         URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().replacePath("/api/" + item.getStatus() + "/{id}")
+                .fromCurrentRequest().replacePath("/api/item/{id}")
                 .buildAndExpand(id).toUri();
         return ResponseEntity.created(location).build();
     }
@@ -68,7 +68,7 @@ public class ItemService {
         question.getResponses().add(response);
         repo.save(item);
         URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().replacePath("/api/" + item.getStatus() + "/{id}")
+                .fromCurrentRequest().replacePath("/api/item/{id}")
                 .buildAndExpand(itemId).toUri();
         return ResponseEntity.created(location).build();
     }

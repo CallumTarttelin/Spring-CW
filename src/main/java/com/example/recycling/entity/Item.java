@@ -33,7 +33,7 @@ public class Item {
     private List<String> categories;
     private List<Question> questions;
 
-    public Item() {
+    private Item() {
         setQuestions(new LinkedList<>());
     }
 
