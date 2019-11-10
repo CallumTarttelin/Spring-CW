@@ -1,14 +1,15 @@
 package com.example.recycling.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.List;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Accessors(chain = true)
 public class Question {
     private String id;
@@ -20,8 +21,7 @@ public class Question {
         this.id = UUID.randomUUID().toString();
     }
 
-    @Data
-    @NoArgsConstructor
+    @Getter
     @AllArgsConstructor
     public static class QuestionDTO {
         private String message;

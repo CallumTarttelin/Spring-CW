@@ -1,8 +1,9 @@
 package com.example.recycling.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -14,7 +15,8 @@ import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Accessors(chain = true)
 @Document
 public class WantedItem {
@@ -35,8 +37,8 @@ public class WantedItem {
     @Field("user")
     private User user;
 
-    @Data
-    @NoArgsConstructor
+    @Getter
+    @AllArgsConstructor
     public static class WantedItemDTO {
         private String description;
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)

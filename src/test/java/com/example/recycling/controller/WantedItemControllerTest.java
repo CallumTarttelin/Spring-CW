@@ -1,9 +1,6 @@
 package com.example.recycling.controller;
 
-import com.example.recycling.entity.Question;
-import com.example.recycling.entity.Response;
-import com.example.recycling.entity.User;
-import com.example.recycling.entity.WantedItem;
+import com.example.recycling.entity.*;
 import com.example.recycling.repository.UserRepository;
 import com.example.recycling.repository.WantedItemRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -23,6 +20,7 @@ import org.springframework.web.util.NestedServletException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -125,7 +123,12 @@ class WantedItemControllerTest {
         assertThat(uri).isNotNull();
         String id = uri.split("/")[uri.split("/").length - 1];
 
-        assertThat(repo.existsById(id)).isTrue();
+        Optional<WantedItem> optionalItem = repo.findById(id);
+        assertThat(optionalItem).isPresent();
+        WantedItem item = optionalItem.get();
+        assertThat(item.getQuestions()).isEmpty();
+        assertThat(item.getDescription()).isEqualTo("an item");
+        assertThat(item.getListUntilDate()).isEqualTo(LocalDateTime.of(2019, 11, 5, 21, 35, 48));
     }
 
     @Test

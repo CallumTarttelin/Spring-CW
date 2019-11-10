@@ -23,6 +23,7 @@ import org.springframework.web.util.NestedServletException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -129,7 +130,11 @@ class OfferedItemControllerTest {
         assertThat(uri).isNotNull();
         String id = uri.split("/")[uri.split("/").length - 1];
 
-        assertThat(repo.existsById(id)).isTrue();
+        Optional<OfferedItem> optionalItem = repo.findById(id);
+        assertThat(optionalItem).isPresent();
+        OfferedItem item = optionalItem.get();
+        assertThat(item.getQuestions()).isEmpty();
+        assertThat(item.getCondition()).isEqualTo("new");
     }
 
     @Test

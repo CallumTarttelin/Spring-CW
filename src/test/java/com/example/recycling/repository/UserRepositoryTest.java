@@ -9,8 +9,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -26,8 +25,8 @@ class UserRepositoryTest {
 
         Optional<User> found = repo.findByUsernameIgnoreCase(user.getUsername());
 
-        assertTrue(found.isPresent());
+        assertThat(found).isPresent();
         User foundUser = found.get();
-        assertEquals(foundUser, user);
+        assertThat(foundUser.getUsername()).isEqualTo(user.getUsername());
     }
 }
