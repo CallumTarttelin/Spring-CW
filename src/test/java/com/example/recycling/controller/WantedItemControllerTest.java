@@ -1,8 +1,11 @@
 package com.example.recycling.controller;
 
-import com.example.recycling.entity.*;
+import com.example.recycling.entity.Item;
+import com.example.recycling.entity.Question;
+import com.example.recycling.entity.Response;
+import com.example.recycling.entity.User;
+import com.example.recycling.repository.ItemRepository;
 import com.example.recycling.repository.UserRepository;
-import com.example.recycling.repository.WantedItemRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 class WantedItemControllerTest {
     @Autowired
-    private WantedItemRepository repo;
+    private ItemRepository repo;
 
     @Autowired
     private WantedItemController controller;
@@ -44,7 +47,7 @@ class WantedItemControllerTest {
     @Autowired
     private UserRepository userRepository;
 
-    private WantedItem item;
+    private Item item;
     private Question question;
     private MockMvc mockMvc;
 
@@ -57,7 +60,7 @@ class WantedItemControllerTest {
                 .setPostcode("postcode")
                 .setPassword("Wow, it's a password!");
         userRepository.save(user);
-        item = new WantedItem()
+        item = Item.wantedItem()
                 .setCategories(Arrays.asList("foo", "bar"))
                 .setDescription("Itemy")
                 .setListUntilDate(LocalDateTime.of(2019, 11, 9, 21, 55, 0))
@@ -123,9 +126,9 @@ class WantedItemControllerTest {
         assertThat(uri).isNotNull();
         String id = uri.split("/")[uri.split("/").length - 1];
 
-        Optional<WantedItem> optionalItem = repo.findById(id);
+        Optional<Item> optionalItem = repo.findById(id);
         assertThat(optionalItem).isPresent();
-        WantedItem item = optionalItem.get();
+        Item item = optionalItem.get();
         assertThat(item.getQuestions()).isEmpty();
         assertThat(item.getDescription()).isEqualTo("an item");
         assertThat(item.getListUntilDate()).isEqualTo(LocalDateTime.of(2019, 11, 5, 21, 35, 48));
@@ -163,7 +166,7 @@ class WantedItemControllerTest {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getHeader("Location");
         assertThat(location).endsWith(basePath);
-        WantedItem commented = repo.findById(item.getId()).orElseThrow();
+        Item commented = repo.findById(item.getId()).orElseThrow();
         assertThat(commented.getQuestions()).hasSize(2);
         assertThat(commented.getQuestions().stream()
                 .map(Question::getMessage)
@@ -213,7 +216,7 @@ class WantedItemControllerTest {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getHeader("Location");
         assertThat(location).endsWith(basePath);
-        WantedItem commented = repo.findById(item.getId()).orElseThrow();
+        Item commented = repo.findById(item.getId()).orElseThrow();
         assertThat(commented.getQuestions().get(0).getResponses()).hasSize(1);
         assertThat(commented.getQuestions().stream()
                 .flatMap(question -> question.getResponses().stream())

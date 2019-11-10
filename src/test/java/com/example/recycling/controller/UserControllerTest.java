@@ -2,7 +2,7 @@ package com.example.recycling.controller;
 
 import com.example.recycling.entity.User;
 import com.example.recycling.repository.UserRepository;
-import com.example.recycling.service.RolesService;
+import com.example.recycling.service.ConstantsService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,7 +64,7 @@ class UserControllerTest {
                 .setEmail("zaphod@beeblebrox.com")
                 .setPostcode("SPACE")
                 .setPassword("foo")
-                .setAuthorities(List.of(RolesService.AUTHENTICATED_USER, "Ex-Galactic_President"));
+                .setAuthorities(List.of(ConstantsService.AUTHENTICATED_USER, "Ex-Galactic_President"));
         repo.save(zaphod);
     }
 

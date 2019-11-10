@@ -1,5 +1,6 @@
 package com.example.recycling.entity;
 
+import com.example.recycling.service.ConstantsService;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,19 +20,29 @@ import java.util.List;
 @Setter
 @Accessors(chain = true)
 @Document
-public class OfferedItem {
+public class Item {
     @Id
     private String id;
     private String condition;
     private String description;
+    // wanted or offered
+    private String status;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
     private LocalDateTime listUntilDate;
     private List<String> categories;
     private List<Question> questions;
 
-    public OfferedItem() {
+    public Item() {
         setQuestions(new LinkedList<>());
+    }
+
+    public static Item offeredItem() {
+        return new Item().setStatus(ConstantsService.OFFERED);
+    }
+
+    public static Item wantedItem() {
+        return new Item().setStatus(ConstantsService.WANTED);
     }
 
     @DBRef
@@ -40,7 +51,7 @@ public class OfferedItem {
 
     @Getter
     @AllArgsConstructor
-    public static class OfferedItemDTO {
+    public static class ItemDTO {
         private String condition;
         private String description;
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)

@@ -19,13 +19,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class RecyclingUserServiceTest {
+public class UserServiceTest {
 
     @Autowired
     private UserRepository repo;
 
     @Autowired
-    RecyclingUserService service;
+    UserService service;
 
     @AfterEach
     void tearDown() {

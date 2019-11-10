@@ -3,8 +3,8 @@ package com.example.recycling.controller;
 import com.example.recycling.entity.User;
 import com.example.recycling.repository.UserRepository;
 import com.example.recycling.service.UserProvider;
-import com.example.recycling.service.RecyclingUserService;
-import com.example.recycling.service.RolesService;
+import com.example.recycling.service.UserService;
+import com.example.recycling.service.ConstantsService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -24,11 +24,11 @@ public class UserController {
 
     private final UserRepository repo;
 
-    private final RecyclingUserService recyclingUserService;
+    private final UserService userService;
 
-    public UserController(UserRepository repo, RecyclingUserService recyclingUserService) {
+    public UserController(UserRepository repo, UserService userService) {
         this.repo = repo;
-        this.recyclingUserService = recyclingUserService;
+        this.userService = userService;
     }
 
     @GetMapping("/user")
@@ -48,8 +48,8 @@ public class UserController {
         if (repo.existsByUsernameIgnoreCase(user.getUsername())) {
             return ResponseEntity.badRequest().build();
         }
-        user.setPassword(recyclingUserService.passwordEncoder().encode(user.getPassword()));
-        user.setAuthorities(new LinkedList<>(Collections.singleton(RolesService.AUTHENTICATED_USER)));
+        user.setPassword(userService.passwordEncoder().encode(user.getPassword()));
+        user.setAuthorities(new LinkedList<>(Collections.singleton(ConstantsService.AUTHENTICATED_USER)));
         User saved = repo.save(user);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
@@ -57,11 +57,11 @@ public class UserController {
         return ResponseEntity.created(location).build();
     }
 
-    @Secured(RolesService.AUTHENTICATED_USER)
+    @Secured(ConstantsService.AUTHENTICATED_USER)
     @PatchMapping(value = "/user", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<Void> updateUser(User updated) {
         User user = UserProvider.getUser();
-        user.setPassword(updated.getPassword() != null ? recyclingUserService.passwordEncoder().encode(updated.getPassword()) : user.getPassword());
+        user.setPassword(updated.getPassword() != null ? userService.passwordEncoder().encode(updated.getPassword()) : user.getPassword());
         user.setPostcode(updated.getPostcode() != null ? updated.getPostcode() : user.getPostcode());
         user.setEmail(updated.getEmail() != null ? updated.getEmail() : user.getEmail());
         user.setAddress(updated.getAddress() != null ? updated.getAddress() : user.getAddress());

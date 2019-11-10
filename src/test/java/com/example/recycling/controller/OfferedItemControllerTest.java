@@ -1,11 +1,12 @@
 package com.example.recycling.controller;
 
-import com.example.recycling.entity.OfferedItem;
+import com.example.recycling.entity.Item;
 import com.example.recycling.entity.Question;
 import com.example.recycling.entity.Response;
 import com.example.recycling.entity.User;
-import com.example.recycling.repository.OfferedItemRepository;
+import com.example.recycling.repository.ItemRepository;
 import com.example.recycling.repository.UserRepository;
+import com.example.recycling.service.ConstantsService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class OfferedItemControllerTest {
 
     @Autowired
-    private OfferedItemRepository repo;
+    private ItemRepository repo;
 
     @Autowired
     private UserRepository userRepository;
@@ -49,7 +50,7 @@ class OfferedItemControllerTest {
     @Autowired
     private OfferedItemController controller;
 
-    private OfferedItem item;
+    private Item item;
     private Question question;
     private MockMvc mockMvc;
 
@@ -61,7 +62,7 @@ class OfferedItemControllerTest {
                 .setPostcode("postcode")
                 .setPassword("Wow, it's a password!");
         userRepository.save(user);
-        item = new OfferedItem()
+        item = Item.offeredItem()
                 .setCondition("new")
                 .setCategories(Arrays.asList("foo", "bar"))
                 .setDescription("Itemy")
@@ -131,11 +132,12 @@ class OfferedItemControllerTest {
         assertThat(uri).isNotNull();
         String id = uri.split("/")[uri.split("/").length - 1];
 
-        Optional<OfferedItem> optionalItem = repo.findById(id);
+        Optional<Item> optionalItem = repo.findById(id);
         assertThat(optionalItem).isPresent();
-        OfferedItem item = optionalItem.get();
+        Item item = optionalItem.get();
         assertThat(item.getQuestions()).isEmpty();
         assertThat(item.getCondition()).isEqualTo("new");
+        assertThat(item.getStatus()).isEqualTo(ConstantsService.OFFERED);
     }
 
     @Test
@@ -170,7 +172,7 @@ class OfferedItemControllerTest {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getHeader("Location");
         assertThat(location).endsWith(basePath);
-        OfferedItem commented = repo.findById(item.getId()).orElseThrow();
+        Item commented = repo.findById(item.getId()).orElseThrow();
         assertThat(commented.getQuestions()).hasSize(2);
         assertThat(commented.getQuestions().stream()
                 .map(Question::getMessage)
@@ -220,7 +222,7 @@ class OfferedItemControllerTest {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getHeader("Location");
         assertThat(location).endsWith(basePath);
-        OfferedItem commented = repo.findById(item.getId()).orElseThrow();
+        Item commented = repo.findById(item.getId()).orElseThrow();
         assertThat(commented.getQuestions().get(0).getResponses()).hasSize(2);
         assertThat(commented.getQuestions().stream()
                 .flatMap(question -> question.getResponses().stream())

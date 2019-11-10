@@ -13,11 +13,11 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class RecyclingUserService implements UserDetailsService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository repo;
 
-    public RecyclingUserService(UserRepository repo) {
+    public UserService(UserRepository repo) {
         this.repo = repo;
     }
 
