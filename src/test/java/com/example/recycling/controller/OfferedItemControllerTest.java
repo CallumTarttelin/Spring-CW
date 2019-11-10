@@ -67,7 +67,7 @@ class OfferedItemControllerTest {
         assertThatThrownBy(() -> mockMvc.perform(post("/api/offered")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8")
-                .content("condition=new&description=an+item&listUntilDate=2019-11-05T21%3A35%3A48Z&categories=items%2Calso%2Bitems"))
+                .content("condition=new&description=an+item&listUntilDate=2019-11-05T21%3A35%3A48Z&categories=items%2Calso+items"))
                 .andExpect(status().isUnauthorized())
         ).isInstanceOf(NestedServletException.class).hasMessageContaining("Access is denied");
     }
@@ -78,7 +78,7 @@ class OfferedItemControllerTest {
         String uri = mockMvc.perform(post("/api/offered")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8")
-                .content("condition=new&description=an+item&listUntilDate=2019-11-05T21%3A35%3A48Z&categories=items%2Calso%2Bitems"))
+                .content("condition=new&description=an+item&listUntilDate=2019-11-05T21%3A35%3A48Z&categories=items%2Calso+items"))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getHeader("Location");
 
@@ -91,6 +91,7 @@ class OfferedItemControllerTest {
         assertThat(item.getQuestions()).isEmpty();
         assertThat(item.getCondition()).isEqualTo("new");
         assertThat(item.getStatus()).isEqualTo(ConstantsService.OFFERED);
+        assertThat(item.getCategories()).containsExactly("items", "also items");
     }
 
 }

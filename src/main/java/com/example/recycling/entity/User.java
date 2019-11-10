@@ -12,6 +12,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@EqualsAndHashCode
 @Document
 @Accessors(chain = true)
 @NoArgsConstructor

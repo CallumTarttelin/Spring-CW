@@ -6,6 +6,7 @@ import com.example.recycling.entity.Response;
 import com.example.recycling.entity.User;
 import com.example.recycling.repository.ItemRepository;
 import com.example.recycling.repository.UserRepository;
+import com.example.recycling.service.ConstantsService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -24,15 +26,14 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -55,12 +56,15 @@ class ItemControllerTest {
 
     @BeforeEach
     void setUp() {
-        User user = new User()
-                .setUsername("Arthur Dent")
-                .setAddress("Earth")
-                .setPostcode("postcode")
-                .setPassword("Wow, it's a password!");
-        userRepository.save(user);
+        User user = userRepository
+                .findByUsernameIgnoreCase("Arthur Dent")
+                .orElse(userRepository.save(new User()
+                        .setUsername("Arthur Dent")
+                        .setAddress("Earth")
+                        .setPostcode("postcode")
+                        .setPassword("Wow, it's a password!")
+                        .setAuthorities(List.of(ConstantsService.AUTHENTICATED_USER))
+                ));
         item = Item.offeredItem()
                 .setCondition("new")
                 .setCategories(Arrays.asList("foo", "bar"))
@@ -80,7 +84,6 @@ class ItemControllerTest {
     @AfterEach
     void tearDown() {
         repo.deleteAll();
-        userRepository.deleteAll();
     }
 
     @Test
@@ -189,5 +192,117 @@ class ItemControllerTest {
                 .map(Response::getMessage)
                 .collect(Collectors.toList())
         ).contains("Hello World");
+    }
+
+    @Test
+    @WithAnonymousUser
+    void unregisteredUser_cannotDelete() {
+        assertThatThrownBy(() -> mockMvc.perform(delete("/api/item/" + item.getId()))
+                .andExpect(status().isUnauthorized())
+        ).isInstanceOf(NestedServletException.class).hasMessageContaining("Access is denied");
+
+        assertThat(repo.existsById(item.getId())).isTrue();
+    }
+
+    @Test
+    @WithMockUser
+    void otherRegisteredUser_cannotDelete() throws Exception {
+        mockMvc.perform(delete("/api/item/" + item.getId()))
+                .andExpect(status().isForbidden());
+
+        assertThat(repo.existsById(item.getId())).isTrue();
+    }
+
+    @Test
+    @WithMockUser
+    void registeredUser_cannotDeleteInvalidItem() throws Exception {
+        mockMvc.perform(delete("/api/item/invalid"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithUserDetails("Arthur Dent")
+    void itemOwner_canDelete() throws Exception {
+        mockMvc.perform(delete("/api/item/" + item.getId()))
+                .andExpect(status().isNoContent());
+
+        assertThat(repo.existsById(item.getId())).isFalse();
+    }
+
+
+    @Test
+    @WithAnonymousUser
+    void unregisteredUser_cannotModify() {
+        assertThatThrownBy(() -> mockMvc.perform(patch("/api/item/" + item.getId())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .characterEncoding("UTF-8")
+                .content("description=Hello+World"))
+                .andExpect(status().isUnauthorized())
+        ).isInstanceOf(NestedServletException.class).hasMessageContaining("Access is denied");
+
+        assertThat(repo.existsById(item.getId())).isTrue();
+    }
+
+    @Test
+    @WithMockUser
+    void otherRegisteredUser_cannotModify() throws Exception {
+        mockMvc.perform(patch("/api/item/" + item.getId()).contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .characterEncoding("UTF-8")
+                .content("description=Hello+World"))
+                .andExpect(status().isForbidden());
+
+        assertThat(repo.existsById(item.getId())).isTrue();
+    }
+
+    @Test
+    @WithMockUser
+    void registeredUser_cannotModifyInvalidItem() throws Exception {
+        mockMvc.perform(patch("/api/item/invalid")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .characterEncoding("UTF-8")
+                .content("description=Hello+World"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithUserDetails("Arthur Dent")
+    void itemOwner_canModifyEverything() throws Exception {
+        mockMvc.perform(patch("/api/item/" + item.getId())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .characterEncoding("UTF-8")
+                .content("condition=old&description=an+item&listUntilDate=2019-11-05T21%3A35%3A48Z&categories=items%2Calso+items"))
+                .andExpect(status().isNoContent());
+
+        Optional<Item> optionalUpdated = repo.findById(item.getId());
+        assertThat(optionalUpdated).isPresent();
+        Item updated = optionalUpdated.get();
+
+        assertThat(updated.getStatus()).isEqualTo(item.getStatus());
+        assertThat(updated.getCondition()).isEqualTo("old");
+        assertThat(updated.getListUntilDate()).isEqualTo(LocalDateTime.of(2019, 11, 5, 21, 35, 48));
+        assertThat(updated.getCategories()).containsExactly("items", "also items");
+        assertThat(updated.getDescription()).isEqualTo("an item");
+    }
+
+    @Test
+    @WithUserDetails("Arthur Dent")
+    void itemOwner_canModifyNothing() throws Exception {
+        String condition = item.getCondition();
+
+        mockMvc.perform(patch("/api/item/" + item.getId())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .characterEncoding("UTF-8")
+                .content(""))
+                .andExpect(status().isNoContent());
+
+        Optional<Item> optionalUpdated = repo.findById(item.getId());
+        assertThat(optionalUpdated).isPresent();
+        Item updated = optionalUpdated.get();
+
+        assertThat(updated.getStatus()).isEqualTo(item.getStatus());
+        assertThat(updated.getCondition()).isEqualTo(condition);
+        assertThat(updated.getListUntilDate()).isEqualTo(item.getListUntilDate());
+        assertThat(updated.getCategories()).isEqualTo(item.getCategories());
+        assertThat(updated.getDescription()).isEqualTo(item.getDescription());
     }
 }
