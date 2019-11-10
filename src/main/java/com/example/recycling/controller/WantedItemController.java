@@ -1,54 +1,40 @@
 package com.example.recycling.controller;
 
-import com.example.recycling.entity.WantedItem;
-import com.example.recycling.repository.WantedItemRepository;
-import com.example.recycling.service.RecyclingUserProvider;
-import com.example.recycling.service.RolesService;
+import com.example.recycling.entity.Item;
+import com.example.recycling.repository.ItemRepository;
+import com.example.recycling.service.ConstantsService;
+import com.example.recycling.service.ItemService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 
 @Controller
 @RequestMapping("/api/")
 public class WantedItemController {
 
-    private final WantedItemRepository repo;
+    private final ItemRepository repo;
+    private final ItemService service;
 
-    public WantedItemController(WantedItemRepository repo) {
+    public WantedItemController(ItemRepository repo, ItemService service) {
         this.repo = repo;
+        this.service = service;
     }
 
     @GetMapping("/wanted")
-    public ResponseEntity<List<WantedItem>> getItems() {
-        return ResponseEntity.ok(repo.findAll());
+    public ResponseEntity<List<Item>> getItems() {
+        return ResponseEntity.ok(repo.findAllWanted());
     }
 
-    @GetMapping("/wanted/{id}")
-    public ResponseEntity<WantedItem> getItem(@PathVariable String id) {
-        return ResponseEntity.of(repo.findById(id));
-    }
-
-    @Secured(RolesService.AUTHENTICATED_USER)
-    @PostMapping("/wanted")
-    public ResponseEntity<Void> makeItem(WantedItem.WantedItemDTO wantedItemDTO) {
-        WantedItem item = new WantedItem()
-                .setDescription(wantedItemDTO.getDescription())
-                .setListUntilDate(wantedItemDTO.getListUntilDate())
-                .setCategories(wantedItemDTO.getCategories())
-                .setUser(RecyclingUserProvider.getUser());
-        WantedItem saved = repo.save(item);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(saved.getId()).toUri();
-        return ResponseEntity.created(location).build();
+    @Secured(ConstantsService.AUTHENTICATED_USER)
+    @PostMapping(value = "/wanted", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<Void> makeItem(Item.ItemDTO itemDTO) {
+        return service.makeItem(Item.wantedItem(), itemDTO);
     }
 
 }

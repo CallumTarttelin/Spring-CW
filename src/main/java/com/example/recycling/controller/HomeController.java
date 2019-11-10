@@ -1,7 +1,7 @@
 package com.example.recycling.controller;
 
-import com.example.recycling.service.RecyclingUserProvider;
-import com.example.recycling.service.RolesService;
+import com.example.recycling.service.UserProvider;
+import com.example.recycling.service.ConstantsService;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,11 +20,11 @@ public class HomeController {
     }
 
     @GetMapping("/secure")
-    @Secured(RolesService.AUTHENTICATED_USER)
+    @Secured(ConstantsService.AUTHENTICATED_USER)
     public ModelAndView secure() {
         ModelAndView result = new ModelAndView();
         result.setViewName("secure");
-        result.addObject("user", RecyclingUserProvider.getUsername());
+        result.addObject("user", UserProvider.getUsername());
         return result;
     }
 }

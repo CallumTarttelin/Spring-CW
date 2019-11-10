@@ -1,9 +1,7 @@
 package com.example.recycling.controller;
 
-import com.example.recycling.entity.User;
-import com.example.recycling.entity.WantedItem;
-import com.example.recycling.repository.UserRepository;
-import com.example.recycling.repository.WantedItemRepository;
+import com.example.recycling.entity.Item;
+import com.example.recycling.repository.ItemRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,11 +17,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.util.NestedServletException;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -34,32 +31,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 class WantedItemControllerTest {
     @Autowired
-    private WantedItemRepository repo;
+    private ItemRepository repo;
 
     @Autowired
     private WantedItemController controller;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    private WantedItem item;
     private MockMvc mockMvc;
 
 
     @BeforeEach
     void setUp() {
-        User user = new User()
-                .setUsername("Arthur Dent")
-                .setAddress("Earth")
-                .setPostcode("postcode")
-                .setPassword("Wow, it's a password!");
-        userRepository.save(user);
-        item = new WantedItem()
-                .setCategories(Arrays.asList("foo", "bar"))
-                .setDescription("Itemy")
-                .setListUntilDate(LocalDateTime.of(2019, 11, 9, 21, 55, 0))
-                .setUser(user);
-        repo.save(item);
+        repo.save(Item.wantedItem());
+        repo.save(Item.wantedItem());
+        repo.save(Item.offeredItem());
 
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
@@ -67,22 +51,6 @@ class WantedItemControllerTest {
     @AfterEach
     void tearDown() {
         repo.deleteAll();
-        userRepository.deleteAll();
-    }
-
-    @Test
-    @WithAnonymousUser
-    void unregisteredUser_canViewAnItemsDescription() throws Exception {
-        mockMvc.perform(get("/api/wanted/" + item.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("description", equalTo("Itemy")));
-    }
-
-    @Test
-    @WithAnonymousUser
-    void viewingNonexistentItem_404s() throws Exception {
-        mockMvc.perform(get("/api/wanted/NONEXISTANT"))
-                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -90,7 +58,7 @@ class WantedItemControllerTest {
     void unregisteredUser_canViewAllItems() throws Exception {
         mockMvc.perform(get("/api/wanted"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)));
+                .andExpect(jsonPath("$", hasSize(2)));
     }
 
     @Test
@@ -116,7 +84,12 @@ class WantedItemControllerTest {
         assertThat(uri).isNotNull();
         String id = uri.split("/")[uri.split("/").length - 1];
 
-        assertThat(repo.existsById(id)).isTrue();
+        Optional<Item> optionalItem = repo.findById(id);
+        assertThat(optionalItem).isPresent();
+        Item item = optionalItem.get();
+        assertThat(item.getQuestions()).isEmpty();
+        assertThat(item.getDescription()).isEqualTo("an item");
+        assertThat(item.getListUntilDate()).isEqualTo(LocalDateTime.of(2019, 11, 5, 21, 35, 48));
     }
 
 }

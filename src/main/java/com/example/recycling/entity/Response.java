@@ -1,14 +1,13 @@
 package com.example.recycling.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import java.util.List;
-
-@Data
+@Getter
+@Setter
 @Accessors(chain = true)
-class Message {
+public class Response {
     private User sentBy;
     private String message;
-    private List<Message> response;
 }
