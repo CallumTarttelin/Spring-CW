@@ -24,6 +24,7 @@ public class WantedItem {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
     private LocalDateTime listUntilDate;
     private List<String> categories;
+    private List<Question> questions;
 
     @DBRef
     @Field("user")

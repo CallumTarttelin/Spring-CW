@@ -6,7 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 
-public class RecyclingUserProvider {
+public class UserProvider {
     private static Optional<RecyclingUser> getRecyclingUser() {
         try {
             return Optional.of((RecyclingUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal());

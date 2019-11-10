@@ -1,5 +1,6 @@
 package com.example.recycling.controller;
 
+import com.example.recycling.entity.Question;
 import com.example.recycling.entity.User;
 import com.example.recycling.entity.WantedItem;
 import com.example.recycling.repository.UserRepository;
@@ -20,6 +21,9 @@ import org.springframework.web.util.NestedServletException;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -58,7 +62,11 @@ class WantedItemControllerTest {
                 .setCategories(Arrays.asList("foo", "bar"))
                 .setDescription("Itemy")
                 .setListUntilDate(LocalDateTime.of(2019, 11, 9, 21, 55, 0))
-                .setUser(user);
+                .setUser(user)
+                .setQuestions(new LinkedList<>(Collections.singletonList(new Question()
+                        .setMessage("Hello")
+                        .setResponse(new LinkedList<>())
+                )));
         repo.save(item);
 
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
@@ -117,6 +125,46 @@ class WantedItemControllerTest {
         String id = uri.split("/")[uri.split("/").length - 1];
 
         assertThat(repo.existsById(id)).isTrue();
+    }
+
+    @Test
+    @WithAnonymousUser
+    void unregisteredUser_cannotComment() {
+        assertThatThrownBy(() -> mockMvc.perform(post("/api/wanted")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .characterEncoding("UTF-8")
+                .content("message=Hello+World"))
+                .andExpect(status().isUnauthorized())
+        ).isInstanceOf(NestedServletException.class).hasMessageContaining("Access is denied");
+    }
+
+    @Test
+    @WithMockUser
+    void withInvalidItem_cannotComment() throws Exception{
+        mockMvc.perform(post("/api/wanted/invalid/question")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .characterEncoding("UTF-8")
+                .content("message=Hello+World"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser
+    void registeredUser_canComment() throws Exception {
+        String basePath = "/api/wanted/" + item.getId();
+        String location = mockMvc.perform(post(basePath + "/question")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .characterEncoding("UTF-8")
+                .content("message=Hello+World"))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getHeader("Location");
+        assertThat(location).endsWith(basePath);
+        WantedItem commented = repo.findById(item.getId()).orElseThrow();
+        assertThat(commented.getQuestions()).hasSize(2);
+        assertThat(commented.getQuestions().stream()
+                .map(Question::getMessage)
+                .collect(Collectors.toList())
+        ).contains("Hello World");
     }
 
 }

@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -82,7 +82,7 @@ class UserControllerTest {
     }
 
     @Test
-    void givenUserExists_whenRetrieved_shouldReturnUser() throws Exception {
+    void givenUserExists_thenShouldReturnUser_whenRetrieved() throws Exception {
         User retrieved = controller.getUser(arthur.getUsername()).getBody();
         assertThat(retrieved).isEqualTo(arthur);
 
@@ -126,7 +126,6 @@ class UserControllerTest {
                 .content("{\"password\": \"bar\", \"address\": \"foo\"}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8"))
-                .andDo(print())
                 .andExpect(status().isNoContent());
 
         Optional<User> optionalUpdated = repo.findByUsernameIgnoreCase(zaphod.getUsername());

@@ -24,9 +24,8 @@ public class OfferedItem {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
     private LocalDateTime listUntilDate;
-    // TODO get timestamps retrieved properly
     private List<String> categories;
-    private List<Message> messages;
+    private List<Question> questions;
 
     @DBRef
     @Field("user")

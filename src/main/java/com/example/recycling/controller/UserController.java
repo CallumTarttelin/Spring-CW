@@ -2,7 +2,7 @@ package com.example.recycling.controller;
 
 import com.example.recycling.entity.User;
 import com.example.recycling.repository.UserRepository;
-import com.example.recycling.service.RecyclingUserProvider;
+import com.example.recycling.service.UserProvider;
 import com.example.recycling.service.RecyclingUserService;
 import com.example.recycling.service.RolesService;
 import org.springframework.http.MediaType;
@@ -60,7 +60,7 @@ public class UserController {
     @Secured(RolesService.AUTHENTICATED_USER)
     @PatchMapping("/user")
     public ResponseEntity<Void> updateUser(@RequestBody User updated) {
-        User user = RecyclingUserProvider.getUser();
+        User user = UserProvider.getUser();
         user.setPassword(updated.getPassword() != null ? recyclingUserService.passwordEncoder().encode(updated.getPassword()) : user.getPassword());
         user.setPostcode(updated.getPostcode() != null ? updated.getPostcode() : user.getPostcode());
         user.setEmail(updated.getEmail() != null ? updated.getEmail() : user.getEmail());
