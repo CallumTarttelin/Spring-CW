@@ -1,9 +1,12 @@
 package com.example.recycling.controller;
 
+import com.example.recycling.entity.Question;
+import com.example.recycling.entity.Response;
 import com.example.recycling.entity.WantedItem;
 import com.example.recycling.repository.WantedItemRepository;
-import com.example.recycling.service.RecyclingUserProvider;
 import com.example.recycling.service.RolesService;
+import com.example.recycling.service.UserProvider;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
@@ -14,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/api/")
@@ -37,17 +42,60 @@ public class WantedItemController {
     }
 
     @Secured(RolesService.AUTHENTICATED_USER)
-    @PostMapping("/wanted")
+    @PostMapping(value = "/wanted", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<Void> makeItem(WantedItem.WantedItemDTO wantedItemDTO) {
         WantedItem item = new WantedItem()
                 .setDescription(wantedItemDTO.getDescription())
                 .setListUntilDate(wantedItemDTO.getListUntilDate())
                 .setCategories(wantedItemDTO.getCategories())
-                .setUser(RecyclingUserProvider.getUser());
+                .setUser(UserProvider.getUser());
         WantedItem saved = repo.save(item);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
                 .buildAndExpand(saved.getId()).toUri();
+        return ResponseEntity.created(location).build();
+    }
+
+    @Secured(RolesService.AUTHENTICATED_USER)
+    @PostMapping(value = "/wanted/{id}/question", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<Void> askQuestion(@PathVariable String id, Question.QuestionDTO questionDTO) {
+        Optional<WantedItem> wantedItem = repo.findById(id);
+        if (wantedItem.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        WantedItem item = wantedItem.get();
+        Question question = new Question()
+                .setMessage(questionDTO.getMessage())
+                .setResponses(new LinkedList<>())
+                .setSentBy(UserProvider.getUser());
+        item.getQuestions().add(question);
+        repo.save(item);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest().replacePath("/api/wanted/{id}")
+                .buildAndExpand(id).toUri();
+        return ResponseEntity.created(location).build();
+    }
+
+    @Secured(RolesService.AUTHENTICATED_USER)
+    @PostMapping(value = "/wanted/{itemId}/question/{questionId}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<Void> answerQuestion(@PathVariable String itemId, @PathVariable String questionId, Question.QuestionDTO questionDTO) {
+        Optional<WantedItem> optionalItem = repo.findById(itemId);
+        Optional<Question> optionalQuestion = optionalItem.flatMap( item ->
+                item.getQuestions().stream().filter(question -> question.getId().equals(questionId)).findFirst()
+        );
+        if (optionalQuestion.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        WantedItem item = optionalItem.get();
+        Question question = optionalQuestion.get();
+        Response response = new Response()
+                .setMessage(questionDTO.getMessage())
+                .setSentBy(UserProvider.getUser());
+        question.getResponses().add(response);
+        repo.save(item);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest().replacePath("/api/wanted/{id}")
+                .buildAndExpand(itemId).toUri();
         return ResponseEntity.created(location).build();
     }
 

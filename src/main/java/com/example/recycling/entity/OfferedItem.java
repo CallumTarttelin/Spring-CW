@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 
 @Data
@@ -24,9 +25,12 @@ public class OfferedItem {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
     private LocalDateTime listUntilDate;
-    // TODO get timestamps retrieved properly
     private List<String> categories;
-    private List<Message> messages;
+    private List<Question> questions;
+
+    public OfferedItem() {
+        this.questions = new LinkedList<>();
+    }
 
     @DBRef
     @Field("user")

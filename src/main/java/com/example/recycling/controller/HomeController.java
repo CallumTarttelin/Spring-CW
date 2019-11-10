@@ -1,6 +1,6 @@
 package com.example.recycling.controller;
 
-import com.example.recycling.service.RecyclingUserProvider;
+import com.example.recycling.service.UserProvider;
 import com.example.recycling.service.RolesService;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
@@ -24,7 +24,7 @@ public class HomeController {
     public ModelAndView secure() {
         ModelAndView result = new ModelAndView();
         result.setViewName("secure");
-        result.addObject("user", RecyclingUserProvider.getUsername());
+        result.addObject("user", UserProvider.getUsername());
         return result;
     }
 }
