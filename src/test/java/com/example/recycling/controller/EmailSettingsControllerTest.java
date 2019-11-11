@@ -127,7 +127,6 @@ class EmailSettingsControllerTest {
         User updated = repo.findByUsernameIgnoreCase(verified.getUsername()).orElseThrow(AssertionError::new);
         assertThat(updated.getEmailSettings().isNotifiedOnQuestion()).isFalse();
         assertThat(updated.getEmailSettings().isNotifiedOnResponse()).isFalse();
-        assertThat(updated.getEmailSettings().isSubscribedToQuestion()).isTrue();
     }
 
     @Test
@@ -141,7 +140,6 @@ class EmailSettingsControllerTest {
         User updated = repo.findByUsernameIgnoreCase(verified.getUsername()).orElseThrow(AssertionError::new);
         assertThat(updated.getEmailSettings().isNotifiedOnQuestion()).isTrue();
         assertThat(updated.getEmailSettings().isNotifiedOnResponse()).isTrue();
-        assertThat(updated.getEmailSettings().isSubscribedToQuestion()).isFalse();
     }
 
 }

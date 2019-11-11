@@ -37,7 +37,6 @@ public class EmailSettingsController {
         EmailSettings settings = user.getEmailSettings();
         settings.setNotifyQuestions(update.getNotifyQuestions() != null ? update.getNotifyQuestions() : settings.getNotifyQuestions());
         settings.setNotifyResponses(update.getNotifyResponses() != null ? update.getNotifyResponses() : settings.getNotifyResponses());
-        settings.setSubscribeToQuestions(update.getSubscribeToQuestions() != null ? update.getSubscribeToQuestions() : settings.getSubscribeToQuestions());
         repo.save(user);
         return ResponseEntity.noContent().build();
     }

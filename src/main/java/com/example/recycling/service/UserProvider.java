@@ -29,7 +29,4 @@ public class UserProvider {
         return getRecyclingUser().map(RecyclingUser::getUsername).orElse(null);
     }
 
-    public static String getEmail() {
-        return getOptionalUser().map(User::getEmail).orElse(null);
-    }
 }

@@ -41,7 +41,7 @@ public class UserServiceTest {
     void loadUserByUsername_successful() {
         String username = "Prostetnic Vogon Jeltz";
         repo.save(new User().setUsername(username)
-                .setEmail("jeltz.vogon@callumtarttelin.com")
+                .setEmail("jeltz.vogon@example-domain.com")
                 .setPassword("pass")
                 .setAuthorities(List.of("VOGON_COMMANDER"))
         );

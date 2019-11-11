@@ -18,8 +18,6 @@ public class EmailSettings {
     @NonNull
     private Boolean notifyResponses;
     @NonNull
-    private Boolean subscribeToQuestions;
-    @NonNull
     @JsonIgnore
     private String verification;
 
@@ -28,7 +26,6 @@ public class EmailSettings {
         setVerification(UUID.randomUUID().toString());
         setNotifyQuestions(true);
         setNotifyResponses(true);
-        setSubscribeToQuestions(false);
     }
 
     public boolean isNotifiedOnQuestion() {
@@ -39,16 +36,11 @@ public class EmailSettings {
         return getVerified() && getNotifyResponses();
     }
 
-    public boolean isSubscribedToQuestion() {
-        return getVerified() && getSubscribeToQuestions();
-    }
-
     @Getter
     @AllArgsConstructor
     public static class EmailSettingsDTO {
         private Boolean notifyQuestions;
         private Boolean notifyResponses;
-        private Boolean subscribeToQuestions;
     }
 
 }
