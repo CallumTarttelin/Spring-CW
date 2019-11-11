@@ -17,8 +17,11 @@ public class ItemService {
 
     private final ItemRepository repo;
 
-    public ItemService(ItemRepository repo) {
+    private final EmailService emailService;
+
+    public ItemService(ItemRepository repo, EmailService emailService) {
         this.repo = repo;
+        this.emailService = emailService;
     }
 
 
@@ -47,6 +50,7 @@ public class ItemService {
                 .setSentBy(UserProvider.getUser());
         item.getQuestions().add(question);
         repo.save(item);
+        emailService.sendQuestionEmail(item, question);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().replacePath("/api/item/{id}")
                 .buildAndExpand(id).toUri();
@@ -68,6 +72,7 @@ public class ItemService {
                 .setSentBy(UserProvider.getUser());
         question.getResponses().add(response);
         repo.save(item);
+        emailService.sendResponseEmail(question, response);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().replacePath("/api/item/{id}")
                 .buildAndExpand(itemId).toUri();

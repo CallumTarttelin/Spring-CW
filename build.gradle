@@ -52,9 +52,6 @@ test {
 jacocoTestCoverageVerification {
     violationRules {
         rule {
-//            includes = ['com.example.recycling.*']
-//            enabled = true
-
             limit {
                 minimum = 0.9
             }

@@ -1,5 +1,6 @@
 package com.example.recycling.entity;
 
+import com.mongodb.lang.NonNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +27,7 @@ public class Question {
     @Getter
     @AllArgsConstructor
     public static class QuestionDTO {
+        @NonNull
         private String message;
     }
 }

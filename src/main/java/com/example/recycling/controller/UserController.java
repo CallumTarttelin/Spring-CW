@@ -2,6 +2,7 @@ package com.example.recycling.controller;
 
 import com.example.recycling.entity.User;
 import com.example.recycling.repository.UserRepository;
+import com.example.recycling.service.EmailService;
 import com.example.recycling.service.UserProvider;
 import com.example.recycling.service.UserService;
 import com.example.recycling.service.ConstantsService;
@@ -16,6 +17,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Controller
@@ -26,9 +28,12 @@ public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserRepository repo, UserService userService) {
+    private final EmailService emailService;
+
+    public UserController(UserRepository repo, UserService userService, EmailService emailService) {
         this.repo = repo;
         this.userService = userService;
+        this.emailService = emailService;
     }
 
     @GetMapping("/user")
@@ -51,6 +56,7 @@ public class UserController {
         user.setPassword(userService.passwordEncoder().encode(user.getPassword()));
         user.setAuthorities(new LinkedList<>(Collections.singleton(ConstantsService.AUTHENTICATED_USER)));
         User saved = repo.save(user);
+        emailService.sendVerificationEmail(saved);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
                 .buildAndExpand(saved.getUsername()).toUri();
@@ -63,6 +69,12 @@ public class UserController {
         User user = UserProvider.getUser();
         user.setPassword(updated.getPassword() != null ? userService.passwordEncoder().encode(updated.getPassword()) : user.getPassword());
         user.setPostcode(updated.getPostcode() != null ? updated.getPostcode() : user.getPostcode());
+        if (updated.getEmail() != null) {
+            user.setEmail(updated.getEmail());
+            user.getEmailSettings().setVerified(false);
+            user.getEmailSettings().setVerification(UUID.randomUUID().toString());
+            emailService.sendVerificationEmail(user);
+        }
         user.setEmail(updated.getEmail() != null ? updated.getEmail() : user.getEmail());
         user.setAddress(updated.getAddress() != null ? updated.getAddress() : user.getAddress());
         repo.save(user);

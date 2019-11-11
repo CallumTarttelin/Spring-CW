@@ -6,14 +6,15 @@ import com.example.recycling.entity.Response;
 import com.example.recycling.entity.User;
 import com.example.recycling.repository.ItemRepository;
 import com.example.recycling.repository.UserRepository;
-import com.example.recycling.service.ConstantsService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -22,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.util.NestedServletException;
 
+import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -33,6 +35,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,6 +45,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class ItemControllerTest {
+
+    @MockBean
+    private JavaMailSenderImpl mailSender;
 
     @Autowired
     private ItemRepository repo;
@@ -62,9 +70,11 @@ class ItemControllerTest {
                         .setUsername("Arthur Dent")
                         .setAddress("Earth")
                         .setPostcode("postcode")
+                        .setEmail("arthur.dent@example-domain.com")
                         .setPassword("Wow, it's a password!")
-                        .setAuthorities(List.of(ConstantsService.AUTHENTICATED_USER))
                 ));
+        user.getEmailSettings().setVerified(true);
+        userRepository.save(user);
         item = Item.offeredItem()
                 .setCondition("new")
                 .setCategories(Arrays.asList("foo", "bar"))
@@ -74,7 +84,8 @@ class ItemControllerTest {
                 .setStatus("Shouldn't Matter (overwrites offered)");
         question = new Question()
                 .setMessage("Hello")
-                .setResponses(new LinkedList<>(List.of(new Response().setMessage("Hi"))));
+                .setResponses(new LinkedList<>(List.of(new Response().setMessage("Hi"))))
+                .setSentBy(user);
         item.getQuestions().add(question);
         repo.save(item);
 
@@ -105,7 +116,7 @@ class ItemControllerTest {
 
     @Test
     @WithAnonymousUser
-    void unregisteredUser_cannotComment() {
+    void unregisteredUser_cannotAskQuestion() {
         assertThatThrownBy(() -> mockMvc.perform(post("/api/item/" + item.getId() + "/question")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8")
@@ -116,7 +127,7 @@ class ItemControllerTest {
 
     @Test
     @WithMockUser
-    void withInvalidItem_cannotComment() throws Exception{
+    void withInvalidItem_cannotAskQuestion() throws Exception{
         mockMvc.perform(post("/api/item/invalid/question")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8")
@@ -125,8 +136,9 @@ class ItemControllerTest {
     }
 
     @Test
-    @WithMockUser
-    void registeredUser_canComment() throws Exception {
+    @WithUserDetails("Arthur Dent")
+    void registeredUser_canAskQuestion() throws Exception {
+        when(mailSender.createMimeMessage()).thenCallRealMethod();
         String basePath = "/api/item/" + item.getId();
         String location = mockMvc.perform(post(basePath + "/question")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -141,6 +153,7 @@ class ItemControllerTest {
                 .map(Question::getMessage)
                 .collect(Collectors.toList())
         ).contains("Hello World");
+        verify(mailSender).send(isA(MimeMessage.class));
     }
 
     @Test
@@ -175,8 +188,10 @@ class ItemControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithUserDetails("Arthur Dent")
     void registeredUser_canAnswerQuestion() throws Exception {
+        when(mailSender.createMimeMessage()).thenCallRealMethod();
+
         String basePath = "/api/item/" + item.getId();
         String location = mockMvc.perform(post(basePath + "/question/" + question.getId())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -192,6 +207,7 @@ class ItemControllerTest {
                 .map(Response::getMessage)
                 .collect(Collectors.toList())
         ).contains("Hello World");
+        verify(mailSender).send(isA(MimeMessage.class));
     }
 
     @Test
