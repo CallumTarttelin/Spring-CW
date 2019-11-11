@@ -5,6 +5,6 @@ jdk:
 
 script:
   - ./gradlew check
-  - ./gradle jacocoTestCoverageVerification
+  - ./gradlew jacocoTestCoverageVerification
 
 dist: bionic
