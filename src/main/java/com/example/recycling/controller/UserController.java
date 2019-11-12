@@ -37,9 +37,9 @@ public class UserController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<String>> getUserNames() {
-        List<String> names = repo.findAll().stream().map(User::getUsername).collect(Collectors.toList());
-        return ResponseEntity.ok(names);
+    @Secured(ConstantsService.AUTHENTICATED_USER)
+    public ResponseEntity<User> getLoggedIn() {
+        return ResponseEntity.ok(UserProvider.getUser());
     }
 
     @GetMapping("/user/{id}")

@@ -3,15 +3,10 @@ import './Items.scss';
 import {useDispatch, useSelector} from "react-redux";
 import {RecyclingState} from "../store/reducers";
 import axios, {AxiosError, AxiosResponse} from 'axios';
-import {setOfferedItems, setWantedItems} from "../store/items/actions";
-import {Item} from "../store/types";
+import {setOfferedItems, setWantedItems} from "../store/item/actions";
+import {Item, Statuses} from "../store/types";
 import ItemSummary from "./ItemSummary/ItemSummary";
 import {Link} from "react-router-dom";
-
-export enum Statuses {
-    Offered = "offered",
-    Wanted = "wanted",
-}
 
 interface ItemsProps {
     status: Statuses;

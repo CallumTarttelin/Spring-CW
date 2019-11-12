@@ -83,19 +83,6 @@ class UserControllerTest {
     }
 
     @Test
-    void whenGettingUsers_AppReturnsAllUsers() throws Exception {
-        List<String> userNames = controller.getUserNames().getBody();
-        assertThat(userNames).isNotNull();
-        assertThat(userNames.contains(arthur.getUsername())).isTrue();
-        assertThat(userNames.size()).isEqualTo(2);
-
-        mockMvc.perform(get("/api/user"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0]", equalTo(arthur.getUsername())));
-    }
-
-    @Test
     void givenUserExists_thenShouldReturnUser_whenRetrieved() throws Exception {
         User retrieved = controller.getUser(arthur.getUsername()).getBody();
         assertThat(retrieved).isNotNull();
@@ -185,5 +172,21 @@ class UserControllerTest {
         assertThat(updated.getEmail()).isEqualTo("zaphod.beeblebrox@example-domain.com");
         assertThat(updated.getEmailSettings().getVerified()).isFalse();
         verify(mailSender).send(isA(MimeMessage.class));
+    }
+
+    @Test
+    @WithAnonymousUser
+    void unregisteredUser_cannotViewLoggedInUser() {
+        assertThatThrownBy(() -> mockMvc.perform(get("/api/user"))
+                .andExpect(status().isUnauthorized())
+        ).isInstanceOf(NestedServletException.class).hasMessageContaining("Access is denied");
+    }
+
+    @Test
+    @WithUserDetails("Zaphod Beeblebrox")
+    void registeredUser_canViewLoggedInUser() throws Exception {
+        mockMvc.perform(get("/api/user"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("username", equalTo("Zaphod Beeblebrox")));
     }
 }

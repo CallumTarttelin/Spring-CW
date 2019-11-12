@@ -1,4 +1,4 @@
-import {ItemActionTypes, ItemState, SET_OFFERED, SET_WANTED} from "./types";
+import {ItemActionTypes, ItemState, SET_OFFERED, SET_WANTED, UPDATE_ITEM} from "./types";
 
 const initialState: ItemState = {
     offered: [],
@@ -11,6 +11,9 @@ export default function itemReducer(itemState: ItemState = initialState, action:
             return {...itemState, offered: action.payload};
         case SET_WANTED:
             return {...itemState, wanted: action.payload};
+        case UPDATE_ITEM:
+            return {...itemState, [action.payload.status]: itemState[action.payload.status]
+                    .filter(item => item.id !== action.payload.id).concat([action.payload])};
         default:
             return itemState
     }

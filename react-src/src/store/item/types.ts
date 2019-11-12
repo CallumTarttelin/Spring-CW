@@ -7,6 +7,7 @@ export interface ItemState {
 
 export const SET_WANTED = 'SET_WANTED';
 export const SET_OFFERED = 'SET_OFFERED';
+export const UPDATE_ITEM = 'UPDATE_ITEM';
 
 interface SetWantedAction {
     type: typeof SET_WANTED;
@@ -18,4 +19,9 @@ interface SetOfferedAction {
     payload: Item[];
 }
 
-export type ItemActionTypes = SetWantedAction | SetOfferedAction;
+interface UpdateItemAction {
+    type: typeof UPDATE_ITEM;
+    payload: Item;
+}
+
+export type ItemActionTypes = SetWantedAction | SetOfferedAction | UpdateItemAction;
