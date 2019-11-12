@@ -8,9 +8,9 @@ export interface UserState {
 
 export const SET_USER = 'SET_USER';
 
-interface SetWantedAction {
+interface SetUser {
     type: typeof SET_USER;
     payload?: User;
 }
 
-export type UserActionTypes = SetWantedAction;
+export type UserActionTypes = SetUser;

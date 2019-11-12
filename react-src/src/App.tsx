@@ -10,6 +10,7 @@ import AddItem from "./addItem/AddItem";
 import {useSelector} from "react-redux";
 import {RecyclingState} from "./store/reducers";
 import Login from "./login/Login";
+import Signup from "./signup/Signup";
 
 function PrivateRoute({ children, ...rest }: any) {
     const location = useLocation();
@@ -50,6 +51,9 @@ const App: React.FC = () => {
                     <Route path="/login" >
                         <Login />
                     </Route>
+                    <Route path="/signup" >
+                        <Signup />
+                    </Route>
                     <Route exact path="/wanted">
                         <Items status={Statuses.Wanted}/>
                     </Route>
@@ -64,6 +68,9 @@ const App: React.FC = () => {
                     </PrivateRoute>
                     <PrivateRoute path="/offered/new">
                         <AddItem status={Statuses.Offered} />
+                    </PrivateRoute>
+                    <PrivateRoute path="/edit-profile">
+                        <Signup updating={true}/>
                     </PrivateRoute>
                 </Switch>
             </Router>

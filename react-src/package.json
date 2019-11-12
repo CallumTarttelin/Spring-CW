@@ -20,6 +20,7 @@
     "react-scripts": "3.2.0",
     "redux": "^4.0.4",
     "redux-starter-kit": "latest",
+    "redux-thunk": "^2.3.0",
     "sass": "^1.23.3",
     "typescript": "3.7.2"
   },

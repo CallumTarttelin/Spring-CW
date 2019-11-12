@@ -14,7 +14,7 @@ type ItemFormData = {
     condition?: string,
     description: string,
     listUntilDate: string,
-    categories: string[],
+    categories: string[] | string,
 }
 
 const AddItem: React.FunctionComponent<AddItemProps> = (props: AddItemProps) => {
@@ -28,7 +28,9 @@ const AddItem: React.FunctionComponent<AddItemProps> = (props: AddItemProps) => 
         const date = new Date(formData.listUntilDate);
         date.setMilliseconds(0);
         formData.listUntilDate = date.toISOString().replace(".000Z", "Z");
-        formData.categories = formData.categories === undefined ? [] : formData.categories;
+        formData.categories = formData.categories === undefined ? [] : (formData.categories as string[]);
+        formData.categories = formData.categories.join(",");
+        console.log(formData);
         axios.post(
             `/api/${props.status}`, qs.stringify(formData),
             {withCredentials: true, headers: {'Content-type': 'application/x-www-form-urlencoded'}}
@@ -65,10 +67,10 @@ const AddItem: React.FunctionComponent<AddItemProps> = (props: AddItemProps) => 
                 <input type="date" name="listUntilDate" ref={register({ required: true })} />
                 {errors.condition && 'list until date is required'}
                 {indexes.map(index => (
-                    <fieldset name={`categories[${index}]`} key={`categories[${index}]`}>
-                        <input name={`categories[${index}].category`} ref={register} />
+                    <div key={`categories[${index}]`}>
+                        <input name={`categories[${index}]`} ref={register} />
                         <button type="button" onClick={removeCategory(index)}>Remove Category</button>
-                    </fieldset>
+                    </div>
                 ))}
                 <button type="button" onClick={addCategory}>Add Category</button>
                 <input type="submit" />
