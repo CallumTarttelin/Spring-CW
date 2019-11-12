@@ -1,5 +1,5 @@
 import React from 'react';
-import {BrowserRouter as Router, Route, Switch, Redirect} from "react-router-dom";
+import {BrowserRouter as Router, Route, Switch, Redirect, useLocation} from "react-router-dom";
 import './App.scss';
 import Header from "./header/Header";
 import Home from "./home/Home";
@@ -12,12 +12,15 @@ import {RecyclingState} from "./store/reducers";
 import Login from "./login/Login";
 
 function PrivateRoute({ children, ...rest }: any) {
+    const location = useLocation();
     const authenticated = useSelector((state: RecyclingState) => state.user.user !== undefined);
+    const loadedUser = useSelector((state: RecyclingState) => state.user.loadedUser);
+
     return (
         <Route
             {...rest}
             render={() =>
-                authenticated ? (
+                loadedUser ? ( authenticated ? (
                     children
                 ) : (
                     <Redirect
@@ -26,7 +29,7 @@ function PrivateRoute({ children, ...rest }: any) {
                             state: { from: location }
                         }}
                     />
-                )
+                )) : <></>
             }
         />
     );

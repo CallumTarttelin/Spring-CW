@@ -6,15 +6,20 @@ import {User} from "../store/types";
 import {useDispatch} from "react-redux";
 import {setUser} from "../store/user/actions";
 
+type LoginFormData = {
+    username: string;
+    password: string;
+}
+
 const Login: React.FC = () => {
     const dispatch = useDispatch();
-    const { register, handleSubmit } = useForm();
+    const { register, handleSubmit } = useForm<LoginFormData>();
     const [isError, setIsError] = useState(false);
 
-    const onSubmit = (formData: Record<string, string>) => {
+    const onSubmit = ({username, password}: LoginFormData) => {
         const data = new FormData();
-        data.set("username", formData.username);
-        data.set("password", formData.password);
+        data.set("username", username);
+        data.set("password", password);
         axios.post("/api/login", data)
             .then((user: AxiosResponse<User>) => {
                 console.log(user);

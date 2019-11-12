@@ -42,6 +42,10 @@ const Items: React.FunctionComponent<ItemsProps> = (props: ItemsProps) => {
             </Link>
             {isError && <h3>Something has gone wrong retrieving items, please try again later.</h3>}
             {items.map(item => <ItemSummary item={item} key={item.id}/>)}
+            <br />
+            <Link to={`/${status}/new`}>
+                new item
+            </Link>
         </div>
     );
 };

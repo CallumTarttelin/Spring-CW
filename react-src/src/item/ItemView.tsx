@@ -24,13 +24,11 @@ const ItemView: React.FC = () => {
                 console.error(err);
                 setIsError(true);
             });
-    });
+    }, [dispatch, id]);
     return (
         <div className="Item">
             {isError && <h3>Something has gone wrong retrieving items, please try again later.</h3>}
-            {item !== undefined &&
-                <p>{item.description}</p>
-            }
+            {item !== undefined && <p>{item.description}</p>}
             {item === undefined && <p>loading</p>}
         </div>
     );

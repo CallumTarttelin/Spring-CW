@@ -1,18 +1,45 @@
 import React, {useState} from 'react';
+import axios, {AxiosResponse} from 'axios';
+import { Redirect } from 'react-router-dom';
 import './AddItem.scss';
 import {Statuses} from "../store/types";
 import useForm from 'react-hook-form';
+import qs from 'querystringify';
 
 interface AddItemProps {
     status: Statuses;
+}
+
+type ItemFormData = {
+    condition?: string,
+    description: string,
+    listUntilDate: string,
+    categories: string[],
 }
 
 const AddItem: React.FunctionComponent<AddItemProps> = (props: AddItemProps) => {
     const initialIndexes: number[] = [];
     const [indexes, setIndexes] = useState(initialIndexes);
     const [counter, setCounter] = useState(0);
-    const { register, handleSubmit, errors } = useForm();
-    const onSubmit = console.log;
+    const [newId, setNewId] = useState("");
+    const [isError, setIsError] = useState(false);
+    const { register, handleSubmit, errors } = useForm<ItemFormData>();
+    const onSubmit = (formData: ItemFormData) => {
+        const date = new Date(formData.listUntilDate);
+        date.setMilliseconds(0);
+        formData.listUntilDate = date.toISOString().replace(".000Z", "Z");
+        formData.categories = formData.categories === undefined ? [] : formData.categories;
+        axios.post(
+            `/api/${props.status}`, qs.stringify(formData),
+            {withCredentials: true, headers: {'Content-type': 'application/x-www-form-urlencoded'}}
+            )
+            .then((resp: AxiosResponse) => {
+                const location: string = resp.headers.location;
+                const split = location.split("/");
+                setNewId(split[split.length - 1]);
+            })
+            .catch(() => setIsError(true))
+    };
 
     const addCategory = () => {
         setIndexes((prevIndexes) => [...prevIndexes, counter]);
@@ -35,17 +62,19 @@ const AddItem: React.FunctionComponent<AddItemProps> = (props: AddItemProps) => 
                 {errors.condition && 'Condition is required'}
                 <input name="description" ref={register({ required: true, maxLength: 120 })} />
                 {errors.condition && 'Description is required, max length 120'}
-                <input type="datetime" name="listUntilDate" ref={register({ required: true })} />
+                <input type="date" name="listUntilDate" ref={register({ required: true })} />
                 {errors.condition && 'list until date is required'}
                 {indexes.map(index => (
-                    <fieldset name={`category[${index}]`} key={`category[${index}]`}>
-                        <input name={`category[${index}].category`} ref={register} />
-                        <button type="button" onClick={removeCategory(index)} />
+                    <fieldset name={`categories[${index}]`} key={`categories[${index}]`}>
+                        <input name={`categories[${index}].category`} ref={register} />
+                        <button type="button" onClick={removeCategory(index)}>Remove Category</button>
                     </fieldset>
                 ))}
-                <button type="button" onClick={addCategory} />
+                <button type="button" onClick={addCategory}>Add Category</button>
                 <input type="submit" />
+                {isError && <p>Error creating item, please check input and try again</p>}
             </form>
+            {newId !== "" && <Redirect to={`/item/${newId}`} />}
         </div>
     );
 };
