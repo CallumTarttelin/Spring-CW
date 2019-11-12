@@ -1,23 +1,16 @@
-import {ADD_ITEM, ItemActionTypes, REMOVE_ITEM_BY_ID, SET_ITEMS} from "./types";
+import {ItemActionTypes, SET_OFFERED, SET_WANTED} from "./types";
 import {Item} from "../types";
 
-export function setItems(items: Item[]): ItemActionTypes {
+export function setWantedItems(items: Item[]): ItemActionTypes {
     return {
-        type: SET_ITEMS,
+        type: SET_WANTED,
         payload: items
     }
 }
 
-export function addItem(items: Item): ItemActionTypes {
+export function setOfferedItems(items: Item[]): ItemActionTypes {
     return {
-        type: ADD_ITEM,
+        type: SET_OFFERED,
         payload: items
-    }
-}
-
-export function removeItemById(id: string): ItemActionTypes {
-    return {
-        type: REMOVE_ITEM_BY_ID,
-        payload: id
     }
 }

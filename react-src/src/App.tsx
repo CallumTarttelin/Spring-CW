@@ -1,12 +1,9 @@
 import React from 'react';
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-} from "react-router-dom";
-import './App.css';
+import {BrowserRouter as Router, Route, Switch,} from "react-router-dom";
+import './App.scss';
 import Header from "./header/Header";
 import Home from "./home/Home";
+import Items, {Statuses} from "./items/Items";
 
 const App: React.FC = () => {
   return (
@@ -14,8 +11,17 @@ const App: React.FC = () => {
       <Header />
       <Router>
           <Switch>
-              <Route path="/">
+              <Route exact path="/" >
                   <Home />
+              </Route>
+              <Route path="/home" >
+                  <Home />
+              </Route>
+              <Route path="/wanted">
+                  <Items status={Statuses.Wanted}/>
+              </Route>
+              <Route path="/offered">
+                  <Items status={Statuses.Offered} />
               </Route>
           </Switch>
       </Router>

@@ -1,26 +1,21 @@
 import {Item} from "../types";
 
 export interface ItemState {
-    items: Item[];
+    wanted: Item[];
+    offered: Item[];
 }
 
-export const SET_ITEMS = 'SET_ITEMS';
-export const ADD_ITEM = 'ADD_ITEM';
-export const REMOVE_ITEM_BY_ID = 'REMOVE_ITEM_BY_ID';
+export const SET_WANTED = 'SET_WANTED';
+export const SET_OFFERED = 'SET_OFFERED';
 
-interface SetItemsAction {
-    type: typeof SET_ITEMS;
+interface SetWantedAction {
+    type: typeof SET_WANTED;
     payload: Item[];
 }
 
-interface AddItemAction {
-    type: typeof ADD_ITEM;
-    payload: Item;
+interface SetOfferedAction {
+    type: typeof SET_OFFERED;
+    payload: Item[];
 }
 
-interface RemoveItemByIdAction {
-    type: typeof REMOVE_ITEM_BY_ID;
-    payload: string;
-}
-
-export type ItemActionTypes = SetItemsAction | AddItemAction | RemoveItemByIdAction;
+export type ItemActionTypes = SetWantedAction | SetOfferedAction;

@@ -1,17 +1,16 @@
-import {ItemActionTypes, ItemState} from "./types";
+import {ItemActionTypes, ItemState, SET_OFFERED, SET_WANTED} from "./types";
 
 const initialState: ItemState = {
-    items: []
+    offered: [],
+    wanted: [],
 };
 
 export default function itemReducer(itemState: ItemState = initialState, action: ItemActionTypes): ItemState {
     switch (action.type) {
-        case "SET_ITEMS":
-            return {items: action.payload};
-        case "ADD_ITEM":
-            return {items: [...itemState.items, action.payload]};
-        case "REMOVE_ITEM_BY_ID":
-            return {items: itemState.items.filter(item => item.id !== action.payload)};
+        case SET_OFFERED:
+            return {...itemState, offered: action.payload};
+        case SET_WANTED:
+            return {...itemState, wanted: action.payload};
         default:
             return itemState
     }

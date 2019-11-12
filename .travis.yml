@@ -6,6 +6,6 @@ script:
   - gradle check
   - gradle jacocoTestCoverageVerification
   - gradle npm_install
-  - gradle npm_test
+#  - gradle npm_test
 
 dist: bionic
