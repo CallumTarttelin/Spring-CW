@@ -30,7 +30,7 @@ public class Item {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
     private LocalDateTime listUntilDate;
-    private List<String> categories;
+    private String category;
     private List<Question> questions;
 
     private Item() {

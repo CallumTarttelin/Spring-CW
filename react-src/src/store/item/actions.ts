@@ -33,9 +33,16 @@ export function fetchItems(status: Statuses): ThunkAction<void, RecyclingState, 
                     dispatch(setOfferedItems(items.data));
                 } else if (status === Statuses.Wanted) {
                     dispatch(setWantedItems(items.data));
-                } else {
-                    console.log(status, Statuses);
                 }
+            })
+    }
+}
+
+export function fetchItem(id: string): ThunkAction<void, RecyclingState, null, ItemActionTypes> {
+    return dispatch => {
+        return axios.get(`/api/item/${id}`)
+            .then((itemData: AxiosResponse<Item>) => {
+                dispatch(updateItem(itemData.data));
             })
     }
 }

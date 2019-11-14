@@ -159,7 +159,7 @@ class UserControllerTest {
         when(mailSender.createMimeMessage()).thenCallRealMethod();
         String originalPass = zaphod.getPassword();
         mockMvc.perform(patch("/api/user")
-                .content("password=Zaphod123&postcode=new+postcode&email=zaphod.beeblebrox%40example-domain.com&address=new+address")
+                .content("password=Zaphod123&postcode=new+postcode&email=zaphod%40example-domain.com&address=new+address")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8"))
                 .andExpect(status().isNoContent());
@@ -169,9 +169,25 @@ class UserControllerTest {
         User updated = optionalUpdated.get();
         assertThat(updated.getPassword()).isNotEqualTo("Zaphod123");
         assertThat(updated.getPassword()).isNotEqualTo(originalPass);
-        assertThat(updated.getEmail()).isEqualTo("zaphod.beeblebrox@example-domain.com");
+        assertThat(updated.getEmail()).isEqualTo("zaphod@example-domain.com");
         assertThat(updated.getEmailSettings().getVerified()).isFalse();
         verify(mailSender).send(isA(MimeMessage.class));
+    }
+
+    @Test
+    @WithUserDetails("Zaphod Beeblebrox")
+    void registeredUser_canPatchProfileWithSameEmailWithoutUpdating() throws Exception {
+        mockMvc.perform(patch("/api/user")
+                .content("password=Zaphod123&postcode=new+postcode&email=zaphod.beeblebrox%40example-domain.com&address=new+address")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .characterEncoding("UTF-8"))
+                .andExpect(status().isNoContent());
+
+        Optional<User> optionalUpdated = repo.findByUsernameIgnoreCase(zaphod.getUsername());
+        assertThat(optionalUpdated).isPresent();
+        User updated = optionalUpdated.get();
+        assertThat(updated.getEmail()).isEqualTo("zaphod.beeblebrox@example-domain.com");
+        assertThat(updated.getEmailSettings().getVerified()).isTrue();
     }
 
     @Test

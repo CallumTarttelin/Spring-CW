@@ -77,7 +77,7 @@ class ItemControllerTest {
         userRepository.save(user);
         item = Item.offeredItem()
                 .setCondition("new")
-                .setCategories(Arrays.asList("foo", "bar"))
+                .setCategory("foobar")
                 .setDescription("Itemy")
                 .setListUntilDate(LocalDateTime.of(2019, 11, 9, 21, 55, 0))
                 .setUser(user)
@@ -103,7 +103,7 @@ class ItemControllerTest {
         mockMvc.perform(get("/api/item/" + item.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("condition", equalTo("new")))
-                .andExpect(jsonPath("categories", contains("foo", "bar")))
+                .andExpect(jsonPath("category", equalTo("foobar")))
                 .andExpect(jsonPath("listUntilDate", equalTo("2019-11-09T21:55:00Z")));
     }
 
@@ -296,7 +296,7 @@ class ItemControllerTest {
         assertThat(updated.getStatus()).isEqualTo(item.getStatus());
         assertThat(updated.getCondition()).isEqualTo("old");
         assertThat(updated.getListUntilDate()).isEqualTo(LocalDateTime.of(2019, 11, 5, 21, 35, 48));
-        assertThat(updated.getCategories()).containsExactly("items", "also items");
+        assertThat(updated.getCategory()).isEqualTo("items,also items");
         assertThat(updated.getDescription()).isEqualTo("an item");
     }
 
@@ -318,7 +318,7 @@ class ItemControllerTest {
         assertThat(updated.getStatus()).isEqualTo(item.getStatus());
         assertThat(updated.getCondition()).isEqualTo(condition);
         assertThat(updated.getListUntilDate()).isEqualTo(item.getListUntilDate());
-        assertThat(updated.getCategories()).isEqualTo(item.getCategories());
+        assertThat(updated.getCategory()).isEqualTo(item.getCategory());
         assertThat(updated.getDescription()).isEqualTo(item.getDescription());
     }
 }

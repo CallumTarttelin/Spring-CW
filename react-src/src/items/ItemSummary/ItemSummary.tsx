@@ -8,15 +8,14 @@ interface ItemsProps {
 }
 
 const ItemSummary: React.FunctionComponent<ItemsProps> = (props: ItemsProps) => {
-    const {id, description, condition, status, categories, listUntilDate} = props.item;
-    console.log(categories);
+    const {id, description, condition, status, category, listUntilDate} = props.item;
     return (
         <div className="ItemSummary">
             <p>{status} - {condition}</p>
             <Link to={`/item/${id}`}>
                 {description}
             </Link>
-            <p>{categories.join(", ")}</p>
+            <p>{category}</p>
             <p>{new Date(listUntilDate).toDateString()}</p>
         </div>
     );

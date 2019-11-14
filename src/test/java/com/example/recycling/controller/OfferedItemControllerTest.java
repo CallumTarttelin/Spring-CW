@@ -91,7 +91,7 @@ class OfferedItemControllerTest {
         assertThat(item.getQuestions()).isEmpty();
         assertThat(item.getCondition()).isEqualTo("new");
         assertThat(item.getStatus()).isEqualTo(ConstantsService.OFFERED);
-        assertThat(item.getCategories()).containsExactly("items", "also items");
+        assertThat(item.getCategory()).isEqualTo("items,also items");
     }
 
 }

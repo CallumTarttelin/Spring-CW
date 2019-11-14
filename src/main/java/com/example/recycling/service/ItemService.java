@@ -30,7 +30,7 @@ public class ItemService {
                 .setCondition(itemDTO.getCondition())
                 .setDescription(itemDTO.getDescription())
                 .setListUntilDate(itemDTO.getListUntilDate())
-                .setCategories(List.of(itemDTO.getCategories().split(",")))
+                .setCategory(itemDTO.getCategories())
                 .setUser(UserProvider.getUser());
         Item saved = repo.save(item);
         URI location = ServletUriComponentsBuilder

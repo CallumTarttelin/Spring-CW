@@ -1,5 +1,5 @@
 import axios, {AxiosResponse} from 'axios';
-import {SET_USER, UserActionTypes} from "./types";
+import {ADD_OTHER_USER, SET_USER, UserActionTypes} from "./types";
 import {User} from "../types";
 import {RecyclingState} from "../reducers";
 import {ThunkAction} from 'redux-thunk';
@@ -7,6 +7,13 @@ import {ThunkAction} from 'redux-thunk';
 export function setUser(user?: User): UserActionTypes {
     return {
         type: SET_USER,
+        payload: user
+    }
+}
+
+export function addOtherUser(user: User): UserActionTypes {
+    return {
+        type: ADD_OTHER_USER,
         payload: user
     }
 }

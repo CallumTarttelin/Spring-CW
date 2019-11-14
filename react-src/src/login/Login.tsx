@@ -22,7 +22,6 @@ const Login: React.FC = () => {
         data.set("password", password);
         axios.post("/api/login", data)
             .then((user: AxiosResponse<User>) => {
-                console.log(user);
                 dispatch(setUser(user.data))
             })
             .catch((err: AxiosError) => {

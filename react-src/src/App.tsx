@@ -11,6 +11,7 @@ import {useSelector} from "react-redux";
 import {RecyclingState} from "./store/reducers";
 import Login from "./login/Login";
 import Signup from "./signup/Signup";
+import Profile from "./profile/Profile";
 
 function PrivateRoute({ children, ...rest }: any) {
     const location = useLocation();
@@ -62,6 +63,9 @@ const App: React.FC = () => {
                     </Route>
                     <Route path="/item/:id">
                         <ItemView />
+                    </Route>
+                    <Route path="/profile/:id">
+                        <Profile />
                     </Route>
                     <PrivateRoute path="/wanted/new">
                         <AddItem status={Statuses.Wanted} />

@@ -9,14 +9,21 @@ export interface Item {
     description: string;
     status: Statuses;
     listUntilDate: string;
-    categories: string[];
+    category: string;
     questions: Question[];
     user: User;
 }
 
-interface Question {
+export interface Question {
     id: string;
     sentBy: User;
+    message: string;
+    responses: Response[];
+}
+
+export interface Response {
+    sentBy: User;
+    message: string;
 }
 
 export interface User {

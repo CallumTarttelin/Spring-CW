@@ -74,7 +74,7 @@ public class ItemController {
         item.setCondition(updated.getCondition() != null ? updated.getCondition() : item.getCondition());
         item.setDescription(updated.getDescription() != null ? updated.getDescription() : item.getDescription());
         item.setListUntilDate(updated.getListUntilDate() != null ? updated.getListUntilDate() : item.getListUntilDate());
-        item.setCategories(updated.getCategories() != null ? List.of(updated.getCategories().split(",")) : item.getCategories());
+        item.setCategory(updated.getCategories() != null ? updated.getCategories() : item.getCategory());
         repo.save(item);
         return ResponseEntity.noContent().build();
     }

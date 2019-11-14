@@ -49,7 +49,6 @@ public class UserController {
 
     @PostMapping(value = "/user", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<Void> makeUser(User user) {
-        user.setUsername(user.getUsername().toLowerCase());
         if (repo.existsByUsernameIgnoreCase(user.getUsername())) {
             return ResponseEntity.badRequest().build();
         }
@@ -69,7 +68,7 @@ public class UserController {
         User user = UserProvider.getUser();
         user.setPassword(updated.getPassword() != null ? userService.passwordEncoder().encode(updated.getPassword()) : user.getPassword());
         user.setPostcode(updated.getPostcode() != null ? updated.getPostcode() : user.getPostcode());
-        if (updated.getEmail() != null) {
+        if (updated.getEmail() != null && !updated.getEmail().equals(user.getEmail())) {
             user.setEmail(updated.getEmail());
             user.getEmailSettings().setVerified(false);
             user.getEmailSettings().setVerification(UUID.randomUUID().toString());
