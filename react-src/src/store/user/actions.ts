@@ -7,14 +7,14 @@ import {ThunkAction} from 'redux-thunk';
 export function setUser(user?: User): UserActionTypes {
     return {
         type: SET_USER,
-        payload: user
+        payload: user === undefined ? undefined : { ...user }
     }
 }
 
 export function addOtherUser(user: User): UserActionTypes {
     return {
         type: ADD_OTHER_USER,
-        payload: user
+        payload: { ...user }
     }
 }
 

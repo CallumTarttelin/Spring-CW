@@ -5,6 +5,7 @@ import axios, {AxiosError, AxiosResponse} from 'axios';
 import {User} from "../store/types";
 import {useDispatch} from "react-redux";
 import {setUser} from "../store/user/actions";
+import {Link} from "react-router-dom";
 
 type LoginFormData = {
     username: string;
@@ -47,6 +48,9 @@ const Login: React.FC = () => {
                 </p>
                 <button className="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
             </form>
+            <br />
+            <br />
+            <Link to="/signup"><button type="button">SignUp</button></Link>
         </div>
     );
 };

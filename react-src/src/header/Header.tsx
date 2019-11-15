@@ -16,8 +16,8 @@ const Header: React.FC = () => {
     return (
         <div className="Header">
             <header className="Header-title">
-                <h1> THIS IS AN APPLICATION</h1>
-                {user !== undefined ? <p>{user.username}</p> : <Link to="/login">login</Link>}
+                <h1>Community Recycling</h1>
+                {user !== undefined ? <Link to={`/profile/${user.username}`}>{user.username}</Link> : <Link to="/login">login</Link>}
             </header>
         </div>
     );

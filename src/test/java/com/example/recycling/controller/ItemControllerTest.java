@@ -321,4 +321,79 @@ class ItemControllerTest {
         assertThat(updated.getCategory()).isEqualTo(item.getCategory());
         assertThat(updated.getDescription()).isEqualTo(item.getDescription());
     }
+
+    @Test
+    @WithMockUser
+    void registeredUser_cannotClaimOthersItem() throws Exception {
+        mockMvc.perform(post("/api/item/" + item.getId() + "/claim"))
+                .andExpect(status().isForbidden());
+
+        Optional<Item> optionalUpdated = repo.findById(item.getId());
+        assertThat(optionalUpdated).isPresent();
+        Item updated = optionalUpdated.get();
+
+        assertThat(updated.getClaimed()).isFalse();
+    }
+
+    @Test
+    @WithMockUser
+    void registeredUser_cannotClaimInvalidItem() throws Exception {
+        mockMvc.perform(post("/api/item/invalid/claim"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithUserDetails("Arthur Dent")
+    void itemOwner_canClaimItem() throws Exception {
+        assertThat(item.getClaimed()).isFalse();
+
+        mockMvc.perform(post("/api/item/" + item.getId() + "/claim"))
+                .andExpect(status().isNoContent());
+
+        Optional<Item> optionalUpdated = repo.findById(item.getId());
+        assertThat(optionalUpdated).isPresent();
+        Item updated = optionalUpdated.get();
+
+        assertThat(updated.getClaimed()).isTrue();
+    }
+
+    @Test
+    @WithMockUser
+    void registeredUser_cannotUnclaimOthersItem() throws Exception {
+        item.setClaimed(true);
+        repo.save(item);
+
+        mockMvc.perform(post("/api/item/" + item.getId() + "/unclaim"))
+                .andExpect(status().isForbidden());
+
+        Optional<Item> optionalUpdated = repo.findById(item.getId());
+        assertThat(optionalUpdated).isPresent();
+        Item updated = optionalUpdated.get();
+
+        assertThat(updated.getClaimed()).isTrue();
+    }
+
+    @Test
+    @WithMockUser
+    void registeredUser_cannotUnclaimInvalidItem() throws Exception {
+        mockMvc.perform(post("/api/item/invalid/unclaim"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithUserDetails("Arthur Dent")
+    void itemOwner_canUnlaimItem() throws Exception {
+        item.setClaimed(true);
+        repo.save(item);
+        assertThat(item.getClaimed()).isTrue();
+
+        mockMvc.perform(post("/api/item/" + item.getId() + "/unclaim"))
+                .andExpect(status().isNoContent());
+
+        Optional<Item> optionalUpdated = repo.findById(item.getId());
+        assertThat(optionalUpdated).isPresent();
+        Item updated = optionalUpdated.get();
+
+        assertThat(updated.getClaimed()).isFalse();
+    }
 }

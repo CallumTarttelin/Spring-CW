@@ -32,9 +32,11 @@ public class Item {
     private LocalDateTime listUntilDate;
     private String category;
     private List<Question> questions;
+    private Boolean claimed;
 
     private Item() {
         setQuestions(new LinkedList<>());
+        setClaimed(false);
     }
 
     public static Item offeredItem() {

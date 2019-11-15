@@ -12,6 +12,7 @@ export interface Item {
     category: string;
     questions: Question[];
     user: User;
+    claimed: boolean;
 }
 
 export interface Question {

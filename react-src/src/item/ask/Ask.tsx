@@ -38,7 +38,7 @@ const Ask: React.FunctionComponent<AddItemProps> = (props: AddItemProps) => {
             <form onSubmit={handleSubmit(onSubmit)}>
                 <input name="message" ref={register({ required: true, maxLength: 300 })} />
                 {errors.message && 'Message is required, max length 300'}
-                <input type="submit" />
+                <input type="submit" value="Send"/>
                 {isError && <p>Error with message, please check input and try again</p>}
             </form>
         </div>

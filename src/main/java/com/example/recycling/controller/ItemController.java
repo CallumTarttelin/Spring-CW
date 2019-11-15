@@ -79,4 +79,36 @@ public class ItemController {
         return ResponseEntity.noContent().build();
     }
 
+    @Secured(ConstantsService.AUTHENTICATED_USER)
+    @PostMapping("/item/{id}/claim")
+    public ResponseEntity<Void> claimItem(@PathVariable String id) {
+        Optional<Item> optionalItem = repo.findById(id);
+        if (optionalItem.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Item item = optionalItem.get();
+        if (! item.getUser().getUsername().equals(UserProvider.getUsername())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        item.setClaimed(true);
+        repo.save(item);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Secured(ConstantsService.AUTHENTICATED_USER)
+    @PostMapping("/item/{id}/unclaim")
+    public ResponseEntity<Void> unclaimItem(@PathVariable String id) {
+        Optional<Item> optionalItem = repo.findById(id);
+        if (optionalItem.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Item item = optionalItem.get();
+        if (! item.getUser().getUsername().equals(UserProvider.getUsername())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        item.setClaimed(false);
+        repo.save(item);
+        return ResponseEntity.noContent().build();
+    }
+
 }

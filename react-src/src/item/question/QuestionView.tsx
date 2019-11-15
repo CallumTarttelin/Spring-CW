@@ -12,13 +12,13 @@ const QuestionView: React.FunctionComponent<QuestionProps> = (props: QuestionPro
     const { message, responses } = props.question;
     const [show, setShow] = useState(false);
     const showForm = () => {
-        setShow(true);
+        setShow(! show);
     };
     return (
         <div className="QuestionView">
             <p>{message}</p>
             <div className="Question-Responses">
-                {responses.map(response => <div className="Response">{response.message}</div>)}
+                {responses.map((response, i) => <div className="Response" key={i}>{response.message}</div>)}
             </div>
             <button onClick={showForm}>Reply</button>
             {show && <Ask item={props.item} question={props.question} /> }

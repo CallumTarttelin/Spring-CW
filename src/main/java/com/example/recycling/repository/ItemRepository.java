@@ -14,4 +14,7 @@ public interface ItemRepository extends MongoRepository<Item, String> {
 
     @Query("{status: " + ConstantsService.WANTED + "}")
     List<Item> findAllWanted();
+
+    // How it could get all for user if required
+    // List<Item> findAllByUser(User user);
 }

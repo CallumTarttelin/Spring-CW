@@ -8,6 +8,7 @@ import qs from 'querystringify';
 import {fetchUser, setUser} from "../store/user/actions";
 import {useDispatch, useSelector} from "react-redux";
 import {RecyclingState} from "../store/reducers";
+import {stripEmpty} from "../store/helpers";
 
 type UserFormData = {
     username: string,
@@ -31,15 +32,6 @@ const Signup: React.FunctionComponent<SignupProps> = (props: SignupProps) => {
     let loggedIn = useSelector((state: RecyclingState) => state.user.user);
     const user = (loggedIn === undefined || ! updating) ?
         {username: "username", email: "email", address: "address", postcode: "postcode"} : loggedIn;
-
-    function stripEmpty(object: {[index: string]: any}): {[index: string]: any} {
-        for (const key in object) {
-            if (! object[key]) {
-                delete object[key]
-            }
-        }
-        return object
-    }
 
     const onSubmit = (formData: UserFormData) => {
         if (updating) {
@@ -78,17 +70,32 @@ const Signup: React.FunctionComponent<SignupProps> = (props: SignupProps) => {
     return (
         <div className="AddItem">
             <form onSubmit={handleSubmit(onSubmit)}>
-                <input name="username" ref={register({ required: ! updating, maxLength: 120 })} placeholder={user.username} />
-                {errors.username && 'Username is required, max length 120'}
-                <input type="email" name="email" ref={register({ required: ! updating})} placeholder={user.email} />
-                {errors.email && 'Email is required'}
-                <input  name="address" ref={register({ required: ! updating })} placeholder={user.address} />
-                {errors.address && 'Address is required'}
-                <input name="postcode" ref={register({required: ! updating})} placeholder={user.postcode} />
-                {errors.postcode && 'Postcode is required'}
-                <input type="password" name="password" ref={register({required: ! updating})} placeholder="password"/>
-                {errors.password && 'list until date is required'}
-                <input type="submit" />
+                <label>
+                    Username:<br />
+                    <input name="username" ref={register({ required: ! updating, maxLength: 120 })} placeholder={user.username} />
+                    {errors.username && 'Username is required, max length 120'}
+                </label>
+                <label>
+                    Email:<br />
+                    <input type="email" name="email" ref={register({ required: ! updating})} placeholder={user.email} />
+                    {errors.email && 'Email is required'}
+                </label>
+                <label>
+                    Address:<br />
+                    <input  name="address" ref={register({ required: ! updating })} placeholder={user.address} />
+                    {errors.address && 'Address is required'}
+                </label>
+                <label>
+                    Postcode:<br />
+                    <input name="postcode" ref={register({required: ! updating})} placeholder={user.postcode} />
+                    {errors.postcode && 'Postcode is required'}
+                </label>
+                <label>
+                    Password:<br />
+                    <input type="password" name="password" ref={register({required: ! updating})} placeholder="password"/>
+                    {errors.password && 'list until date is required'}
+                </label>
+                <input type="submit" value={updating ? "Update" : "Sign Up"}/>
                 {isError && <p>Error signing up, please check input and try again</p>}
             </form>
             {redirect && <Redirect to={`/`} />}

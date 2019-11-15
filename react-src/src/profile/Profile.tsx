@@ -12,6 +12,7 @@ const Profile: React.FC = () => {
     const username: string = id !== undefined ? id : "";
     const dispatch = useDispatch();
     const user = useSelector((state: RecyclingState) => state.user.others.find(user => user.username.toLowerCase() === username.toLowerCase()));
+    const loggedIn = useSelector((state: RecyclingState) => state.user.user);
     const [isError, setIsError] = useState(false);
 
 
@@ -31,6 +32,8 @@ const Profile: React.FC = () => {
             {isError && <h3>Something has gone wrong retrieving user, please try again later.</h3>}
             {user !== undefined && <p>{user.username}</p>}
             {user === undefined && <p>loading</p>}
+            {loggedIn !== undefined && user !== undefined && user.username === loggedIn.username && <Link to='/edit-profile'>Edit Profile</Link>}
+            <br />
             <Link to="/">back</Link>
         </div>
     );

@@ -12,6 +12,7 @@ import {RecyclingState} from "./store/reducers";
 import Login from "./login/Login";
 import Signup from "./signup/Signup";
 import Profile from "./profile/Profile";
+import ChangeItem from "./changeItem/ChangeItem";
 
 function PrivateRoute({ children, ...rest }: any) {
     const location = useLocation();
@@ -73,9 +74,17 @@ const App: React.FC = () => {
                     <PrivateRoute path="/offered/new">
                         <AddItem status={Statuses.Offered} />
                     </PrivateRoute>
+                    <PrivateRoute path="/edit-item/:id">
+                        <ChangeItem />
+                    </PrivateRoute>
                     <PrivateRoute path="/edit-profile">
                         <Signup updating={true}/>
                     </PrivateRoute>
+                    <Route path="/" >
+                        <div className="NOTFOUND">
+                            <h1>Page not found</h1>
+                        </div>
+                    </Route>
                 </Switch>
             </Router>
         </div>
