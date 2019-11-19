@@ -2,7 +2,7 @@
     text-align: center;
 }
 
-.Header-title {
+.Header-header {
     background-color: #282c34;
     min-height: 10vh;
     display: flex;
@@ -12,4 +12,9 @@
     color: white;
     padding-left: 2em;
     padding-right: 2em;
+}
+
+.Header-link {
+    color: white;
+    text-decoration: none;
 }

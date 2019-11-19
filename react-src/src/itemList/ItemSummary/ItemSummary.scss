@@ -1,0 +1,22 @@
+.ItemSummary {
+  border: 1px solid #282c34;
+  padding: 1em;
+  border-radius: 1em;
+  font-size: 12px;
+  width: 40vh;
+  margin: 0 auto;
+  cursor: pointer;
+}
+
+.ItemSummary-left {
+  margin-right: 1em;
+}
+
+.ItemSummary-right {
+  margin-left: 1em;
+}
+
+.ItemSummary-link {
+  color: black;
+  text-decoration: none;
+}

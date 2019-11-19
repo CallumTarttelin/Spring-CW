@@ -4,6 +4,7 @@ import com.example.recycling.entity.Item;
 import com.example.recycling.entity.Question;
 import com.example.recycling.entity.Response;
 import com.example.recycling.entity.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -18,6 +19,8 @@ import javax.mail.internet.MimeMessage;
 public class EmailService {
 
     private final JavaMailSender emailSender;
+
+    private @Value("${recycling.email.from}") String fromAddress;
 
     public EmailService(JavaMailSender emailSender) {
         this.emailSender = emailSender;
@@ -58,7 +61,7 @@ public class EmailService {
         try {
             Address emailAddress = new InternetAddress(email);
             MimeMessage mimeMessage = emailSender.createMimeMessage();
-            mimeMessage.setFrom("recycling@callumtarttelin.com");
+            mimeMessage.setFrom(fromAddress);
             mimeMessage.addRecipient(Message.RecipientType.TO, emailAddress);
             mimeMessage.setSubject(subject);
             mimeMessage.setText(message);

@@ -15,9 +15,9 @@ const Header: React.FC = () => {
 
     return (
         <div className="Header">
-            <header className="Header-title">
-                <h1>Community Recycling</h1>
-                {user !== undefined ? <Link to={`/profile/${user.username}`}>{user.username}</Link> : <Link to="/login">login</Link>}
+            <header className="Header-header">
+                <Link to="" className="Header-link"><h1 className="Header-title">Community Recycling</h1></Link>
+                {user !== undefined ? <Link className="Header-link" to={`/profile/${user.username}`}>{user.username}</Link> : <Link className="Header-link" to="/login">login</Link>}
             </header>
         </div>
     );

@@ -4,8 +4,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {RecyclingState} from "../store/reducers";
 import {fetchItems} from "../store/item/actions";
 import {Statuses} from "../store/types";
-import ItemSummary from "./ItemSummary/ItemSummary";
 import {Link} from "react-router-dom";
+import ItemList from "../itemList/ItemList";
 
 interface ItemsProps {
     status: Statuses;
@@ -21,13 +21,14 @@ const Items: React.FunctionComponent<ItemsProps> = (props: ItemsProps) => {
 
     return (
         <div className="Items">
-            <Link to="/home">
-                back
-            </Link>
-            {items.map(item => <ItemSummary item={item} key={item.id}/>)}
+            <br />
+            <br />
+            <ItemList items={items} />
             <br />
             <Link to={`/${props.status}/new`}>
-                new item
+                <button type="button">
+                    new item
+                </button>
             </Link>
         </div>
     );

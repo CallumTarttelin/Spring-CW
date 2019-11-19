@@ -34,6 +34,10 @@ public class Item {
     private List<Question> questions;
     private Boolean claimed;
 
+    @DBRef
+    @Field("user")
+    private User user;
+
     private Item() {
         setQuestions(new LinkedList<>());
         setClaimed(false);
@@ -46,10 +50,6 @@ public class Item {
     public static Item wantedItem() {
         return new Item().setStatus(ConstantsService.WANTED);
     }
-
-    @DBRef
-    @Field("user")
-    private User user;
 
     @Getter
     @AllArgsConstructor

@@ -20,3 +20,12 @@
 .App-link {
     color: #09d3ac;
 }
+
+.Home-Items {
+    display: flex;
+    align-content: space-between;
+}
+
+.Home-Offered, .Home-Wanted {
+    margin: 2em;
+}
