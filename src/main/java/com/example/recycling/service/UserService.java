@@ -17,12 +17,14 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository repo;
 
+    // Create user service with repository
     public UserService(UserRepository repo) {
         this.repo = repo;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // return the username, if it's not there throw UsernameNotFoundException
         Optional<User> user = repo.findByUsernameIgnoreCase(username);
         if (user.isEmpty()) {
             throw new UsernameNotFoundException(username);
@@ -31,6 +33,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Bean
+    // Return password encoder
     public Argon2PasswordEncoder passwordEncoder() {
         return new Argon2PasswordEncoder(64, 128, 4, 1<<16, 5);
     }

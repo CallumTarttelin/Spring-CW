@@ -9,9 +9,11 @@ import java.util.List;
 
 public interface ItemRepository extends MongoRepository<Item, String> {
 
+    // findAllOffered returns response of the query
     @Query("{status: " + ConstantsService.OFFERED + "}")
     List<Item> findAllOffered();
 
+    // findAllWanted returns response of the query
     @Query("{status: " + ConstantsService.WANTED + "}")
     List<Item> findAllWanted();
 

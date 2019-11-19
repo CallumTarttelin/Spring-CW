@@ -12,22 +12,27 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+// Create accessors
 @Getter
 @Setter
 @Accessors(chain = true)
 public class Question {
+    // POJO things, has these fields
     private String id;
     private String message;
     private List<Response> responses;
+    // Has reference to user object
     @DBRef
     @Field("sentBy")
     private User sentBy;
 
+    // Create with default values
     public Question() {
         this.setId(UUID.randomUUID().toString());
         this.setResponses(new LinkedList<>());
     }
 
+    // Create a DTO with getter methods and a constructor which sets all parameters
     @Getter
     @AllArgsConstructor
     public static class QuestionDTO {

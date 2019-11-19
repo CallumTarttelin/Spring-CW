@@ -5,12 +5,16 @@ import com.mongodb.lang.NonNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.UUID;
 
+// Create accessor methods
 @Getter
 @Setter
+@Accessors(chain = true)
 public class EmailSettings {
+    // POJO, add these fields
     @NonNull
     private Boolean verified;
     @NonNull
@@ -18,9 +22,11 @@ public class EmailSettings {
     @NonNull
     private Boolean notifyResponses;
     @NonNull
+    // Don't send this on requests
     @JsonIgnore
     private String verification;
 
+    // When creating set default values
     public EmailSettings() {
         setVerified(false);
         setVerification(UUID.randomUUID().toString());
@@ -28,14 +34,18 @@ public class EmailSettings {
         setNotifyResponses(true);
     }
 
+
     public boolean isNotifiedOnQuestion() {
+        // User is notified if verified and opted into notifications on questions
         return getVerified() && getNotifyQuestions();
     }
 
     public boolean isNotifiedOnResponse() {
+        // User is notified if verified and opted into notifications on questions
         return getVerified() && getNotifyResponses();
     }
 
+    // Create a DTO with getter methods and a constructor which sets all parameters
     @Getter
     @AllArgsConstructor
     public static class EmailSettingsDTO {
