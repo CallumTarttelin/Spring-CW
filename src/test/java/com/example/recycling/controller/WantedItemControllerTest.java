@@ -90,7 +90,7 @@ class WantedItemControllerTest {
         assertThat(item.getQuestions()).isEmpty();
         assertThat(item.getDescription()).isEqualTo("an item");
         assertThat(item.getListUntilDate()).isEqualTo(LocalDateTime.of(2019, 11, 5, 21, 35, 48));
-        assertThat(item.getCategories()).containsExactly("items", "also items");
+        assertThat(item.getCategory()).isEqualTo("items,also items");
     }
 
 }

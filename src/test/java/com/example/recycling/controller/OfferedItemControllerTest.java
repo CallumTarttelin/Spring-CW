@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.util.NestedServletException;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,7 +92,7 @@ class OfferedItemControllerTest {
         assertThat(item.getQuestions()).isEmpty();
         assertThat(item.getCondition()).isEqualTo("new");
         assertThat(item.getStatus()).isEqualTo(ConstantsService.OFFERED);
-        assertThat(item.getCategories()).containsExactly("items", "also items");
+        assertThat(item.getCategory()).isEqualTo("items,also items");
     }
 
 }

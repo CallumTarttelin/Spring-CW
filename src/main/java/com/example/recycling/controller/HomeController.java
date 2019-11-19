@@ -1,30 +1,23 @@
 package com.example.recycling.controller;
 
-import com.example.recycling.service.UserProvider;
-import com.example.recycling.service.ConstantsService;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class HomeController {
-    @GetMapping({"/", ""})
-    public String index() {
-        return "index";
+
+    // To all API calls, response 401 if none found
+    @RequestMapping("/api/**")
+    public ResponseEntity<Void> invalidApi() {
+        return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/signup")
-    public String signUp() {
-        return "signUp";
+    // For all requests (after matching all api) return frontend index.html
+    @GetMapping(value = {"/{regex:\\w+}", "/**/{regex:\\w+}"})
+    public String catch404() {
+        return "forward:/";
     }
 
-    @GetMapping("/secure")
-    @Secured(ConstantsService.AUTHENTICATED_USER)
-    public ModelAndView secure() {
-        ModelAndView result = new ModelAndView();
-        result.setViewName("secure");
-        result.addObject("user", UserProvider.getUsername());
-        return result;
-    }
 }

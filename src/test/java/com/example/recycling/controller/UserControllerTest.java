@@ -83,19 +83,6 @@ class UserControllerTest {
     }
 
     @Test
-    void whenGettingUsers_AppReturnsAllUsers() throws Exception {
-        List<String> userNames = controller.getUserNames().getBody();
-        assertThat(userNames).isNotNull();
-        assertThat(userNames.contains(arthur.getUsername())).isTrue();
-        assertThat(userNames.size()).isEqualTo(2);
-
-        mockMvc.perform(get("/api/user"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0]", equalTo(arthur.getUsername())));
-    }
-
-    @Test
     void givenUserExists_thenShouldReturnUser_whenRetrieved() throws Exception {
         User retrieved = controller.getUser(arthur.getUsername()).getBody();
         assertThat(retrieved).isNotNull();
@@ -172,7 +159,7 @@ class UserControllerTest {
         when(mailSender.createMimeMessage()).thenCallRealMethod();
         String originalPass = zaphod.getPassword();
         mockMvc.perform(patch("/api/user")
-                .content("password=Zaphod123&postcode=new+postcode&email=zaphod.beeblebrox%40example-domain.com&address=new+address")
+                .content("password=Zaphod123&postcode=new+postcode&email=zaphod%40example-domain.com&address=new+address")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8"))
                 .andExpect(status().isNoContent());
@@ -182,8 +169,40 @@ class UserControllerTest {
         User updated = optionalUpdated.get();
         assertThat(updated.getPassword()).isNotEqualTo("Zaphod123");
         assertThat(updated.getPassword()).isNotEqualTo(originalPass);
-        assertThat(updated.getEmail()).isEqualTo("zaphod.beeblebrox@example-domain.com");
+        assertThat(updated.getEmail()).isEqualTo("zaphod@example-domain.com");
         assertThat(updated.getEmailSettings().getVerified()).isFalse();
         verify(mailSender).send(isA(MimeMessage.class));
+    }
+
+    @Test
+    @WithUserDetails("Zaphod Beeblebrox")
+    void registeredUser_canPatchProfileWithSameEmailWithoutUpdating() throws Exception {
+        mockMvc.perform(patch("/api/user")
+                .content("password=Zaphod123&postcode=new+postcode&email=zaphod.beeblebrox%40example-domain.com&address=new+address")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .characterEncoding("UTF-8"))
+                .andExpect(status().isNoContent());
+
+        Optional<User> optionalUpdated = repo.findByUsernameIgnoreCase(zaphod.getUsername());
+        assertThat(optionalUpdated).isPresent();
+        User updated = optionalUpdated.get();
+        assertThat(updated.getEmail()).isEqualTo("zaphod.beeblebrox@example-domain.com");
+        assertThat(updated.getEmailSettings().getVerified()).isTrue();
+    }
+
+    @Test
+    @WithAnonymousUser
+    void unregisteredUser_cannotViewLoggedInUser() {
+        assertThatThrownBy(() -> mockMvc.perform(get("/api/user"))
+                .andExpect(status().isUnauthorized())
+        ).isInstanceOf(NestedServletException.class).hasMessageContaining("Access is denied");
+    }
+
+    @Test
+    @WithUserDetails("Zaphod Beeblebrox")
+    void registeredUser_canViewLoggedInUser() throws Exception {
+        mockMvc.perform(get("/api/user"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("username", equalTo("Zaphod Beeblebrox")));
     }
 }
